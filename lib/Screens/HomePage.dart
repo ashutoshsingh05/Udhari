@@ -1,24 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:udhari_2/Screens/HomePages/Trips.dart';
+import 'package:udhari_2/Screens/HomePages/History.dart';
+import 'package:udhari_2/Screens/HomePages/NormalUdhari.dart';
 import 'package:unicorndial/unicorndial.dart';
 import 'package:udhari_2/Utils/HomePage/IconHandler.dart';
 import 'package:udhari_2/Utils/HomePage/ScreenHandler.dart';
 import 'package:udhari_2/Utils/HomePage/BottomBarIndexHandler.dart';
 import 'package:udhari_2/Widgets/Layout.dart';
 import 'package:udhari_2/Widgets/FabWithIcons.dart';
+import 'package:udhari_2/Screens/HomePages/Dashboard.dart';
 
-class Dashboard extends StatefulWidget {
-  Dashboard({this.firestore, this.uuid});
+class HomePage extends StatefulWidget {
+  HomePage({this.firestore, this.uuid});
 
   final firestore, uuid;
 
   @override
-  _DashboardState createState() => _DashboardState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _HomePageState extends State<HomePage> {
   List childButtons = List<UnicornButton>();
 
   // List bottomNaviagtionBarList = List<BottomAppBarItemsItem>();
@@ -86,84 +89,6 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  // void initializeBottomNavigationBar() {
-  //   bottomNaviagtionBarList.add(
-  //     BottomNavigationBarItem(
-  //       title: Text("Single"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: udhariIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  //   bottomNaviagtionBarList.add(
-  //     BottomNavigationBarItem(
-  //       title: Text("Daily Expenses"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: moneyIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  //   bottomNaviagtionBarList.add(
-  //     BottomNavigationBarItem(
-  //       title: Text("Group"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: groupIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // void initializeBottomAppBarItems() {
-  //   bottomNaviagtionBarList.add(
-  //     BottomAppBarItems(
-  //       title: Text("Single"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: udhariIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  //   bottomNaviagtionBarList.add(
-  //     BottomAppBarItems(
-  //       title: Text("Daily Expenses"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: moneyIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  //   bottomNaviagtionBarList.add(
-  //     BottomAppBarItems(
-  //       title: Text("Group"),
-  //       icon: StreamBuilder(
-  //         initialData: Icon(Icons.check_box_outline_blank),
-  //         stream: groupIcon.iconStream,
-  //         builder: (BuildContext context, snapshot) {
-  //           return snapshot.data;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,17 +111,35 @@ class _DashboardState extends State<Dashboard> {
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         notchMargin: 4.0,
-        child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {},
+              icon: Icon(Icons.home),
+              onPressed: () {
+                screens.screenSink.add(Dashboard());
+              },
             ),
             IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
+              icon: Icon(Icons.person),
+              onPressed: () {
+                screens.screenSink.add(NormalUdhari());
+              },
+            ),
+            SizedBox(
+              width: 50,
+            ),
+            IconButton(
+              icon: Icon(Icons.people),
+              onPressed: () {
+                screens.screenSink.add(Trips());
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.history),
+              onPressed: () {
+                screens.screenSink.add(History());
+              },
             ),
           ],
         ),
@@ -205,13 +148,13 @@ class _DashboardState extends State<Dashboard> {
       // FAB with Notched bottom appbar taken from https://github.com/bizz84/bottom_bar_fab_flutter
       // by Andrea Bizzotto
 
-      floatingActionButton: _buildFab(context), // This
+      floatingActionButton: _buildFab(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
   Widget _buildFab(BuildContext context) {
-    final icons = [Icons.sms, Icons.mail, Icons.phone];
+    final icons = [Icons.person_add, Icons.group_add, Icons.drive_eta];
     return AnchoredOverlay(
       showOverlay: true,
       overlayBuilder: (context, offset) {
@@ -220,14 +163,14 @@ class _DashboardState extends State<Dashboard> {
           child: FabWithIcons(
             icons: icons,
             onIconTapped: (_) {
-              print("FAB index $_");
+              print("FAB index: $_");
             },
           ),
         );
       },
       child: FloatingActionButton(
         onPressed: () {},
-        tooltip: 'Increment',
+        tooltip: 'Add',
         child: Icon(Icons.add),
         elevation: 2.0,
       ),

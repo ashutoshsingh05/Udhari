@@ -46,7 +46,7 @@ class _IntroState extends State<Intro> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => Dashboard(),
+        builder: (BuildContext context) => HomePage(),
       ),
     );
   }
