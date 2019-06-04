@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intro_slider/intro_slider.dart';
-import 'package:udhari_2/Dashboard.dart';
+import 'package:udhari_2/Screens/HomePage.dart';
 
 class Intro extends StatefulWidget {
   @override

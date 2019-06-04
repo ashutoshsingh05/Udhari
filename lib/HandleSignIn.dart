@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:udhari_2/Intro.dart';
-import 'package:udhari_2/SplashScreen.dart';
-import 'package:udhari_2/Dashboard.dart';
+import 'package:udhari_2/Screens/Intro.dart';
+import 'package:udhari_2/Screens/SplashScreen.dart';
+import 'package:udhari_2/Screens/HomePage.dart';
 
 class HandleSignIn extends StatefulWidget {
   @override
