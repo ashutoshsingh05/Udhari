@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:udhari_2/Screens/HomePages/Dashboard.dart';
 import 'package:udhari_2/Screens/HomePages/Trips.dart';
 import 'package:udhari_2/Screens/HomePages/History.dart';
 import 'package:udhari_2/Screens/HomePages/NormalUdhari.dart';
-import 'package:unicorndial/unicorndial.dart';
-import 'package:udhari_2/Utils/HomePage/IconHandler.dart';
-import 'package:udhari_2/Utils/HomePage/ScreenHandler.dart';
-import 'package:udhari_2/Utils/HomePage/BottomBarIndexHandler.dart';
+import 'package:udhari_2/Utils/ScreenHandler.dart';
+import 'package:udhari_2/Utils/IconHandler.dart';
 import 'package:udhari_2/Widgets/Layout.dart';
 import 'package:udhari_2/Widgets/FabWithIcons.dart';
-import 'package:udhari_2/Screens/HomePages/Dashboard.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.firestore, this.uuid});
@@ -22,71 +20,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List childButtons = List<UnicornButton>();
-
-  // List bottomNaviagtionBarList = List<BottomAppBarItemsItem>();
-  IconHandler udhariIcon = IconHandler(Icon(Icons.person_outline));
-  IconHandler moneyIcon = IconHandler(Icon(Icons.attach_money));
-  IconHandler groupIcon = IconHandler(Icon(Icons.people_outline));
-
-  ScreenHandler screens = ScreenHandler(Icon(Icons.person_outline));
-  BottomBarIndexHandler bottomBarIndexHandler = BottomBarIndexHandler(2);
-
-  int _currentIndex = 0;
+  ScreenHandler screens = ScreenHandler(Dashboard());
+  IconHandler homeIcon =
+      IconHandler(Icon(Icons.home, color: Colors.blueAccent));
+  IconHandler personIcon = IconHandler(Icon(Icons.person));
+  IconHandler peopleIcon = IconHandler(Icon(Icons.group));
+  IconHandler historyIcon = IconHandler(Icon(Icons.history));
 
   @override
   void initState() {
     super.initState();
-    initializeUnicornButtons();
-    // initializeBottomAppBarItems();
   }
 
   @override
   void dispose() {
-    udhariIcon.iconController.close();
-    moneyIcon.iconController.close();
-    groupIcon.iconController.close();
     super.dispose();
-  }
-
-  void initializeUnicornButtons() {
-    childButtons.add(
-      UnicornButton(
-        hasLabel: true,
-        labelText: "Single Udhari",
-        currentButton: FloatingActionButton(
-          heroTag: "Single",
-          backgroundColor: Colors.redAccent,
-          mini: true,
-          child: Icon(Icons.person_add),
-          onPressed: () {},
-        ),
-      ),
-    );
-
-    childButtons.add(
-      UnicornButton(
-        currentButton: FloatingActionButton(
-          heroTag: "airplane",
-          backgroundColor: Colors.greenAccent,
-          mini: true,
-          child: Icon(Icons.group_add),
-          onPressed: () {},
-        ),
-      ),
-    );
-
-    childButtons.add(
-      UnicornButton(
-        currentButton: FloatingActionButton(
-          heroTag: "directions",
-          backgroundColor: Colors.blueAccent,
-          mini: true,
-          child: Icon(Icons.directions_car),
-          onPressed: () {},
-        ),
-      ),
-    );
+    screens.screenController.close();
+    homeIcon.iconController.close();
+    personIcon.iconController.close();
+    peopleIcon.iconController.close();
+    historyIcon.iconController.close();
   }
 
   @override
@@ -115,30 +68,76 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.home),
+              icon: StreamBuilder(
+                stream: homeIcon.iconStream,
+                initialData: Container(),
+                builder: (BuildContext context, snapshot) {
+                  return snapshot.data;
+                },
+              ),
               onPressed: () {
                 screens.screenSink.add(Dashboard());
+                homeIcon.changeIcon(Icon(Icons.home, color: Colors.blueAccent));
+                personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
+                peopleIcon.changeIcon(Icon(Icons.people, color: Colors.black));
+                historyIcon
+                    .changeIcon(Icon(Icons.history, color: Colors.black));
               },
             ),
             IconButton(
-              icon: Icon(Icons.person),
+              icon: StreamBuilder(
+                stream: personIcon.iconStream,
+                initialData: Container(),
+                builder: (BuildContext context, snapshot) {
+                  return snapshot.data;
+                },
+              ),
               onPressed: () {
                 screens.screenSink.add(NormalUdhari());
+                homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
+                personIcon
+                    .changeIcon(Icon(Icons.person, color: Colors.blueAccent));
+                peopleIcon.changeIcon(Icon(Icons.people, color: Colors.black));
+                historyIcon
+                    .changeIcon(Icon(Icons.history, color: Colors.black));
               },
             ),
             SizedBox(
               width: 50,
             ),
             IconButton(
-              icon: Icon(Icons.people),
+              icon: StreamBuilder(
+                stream: peopleIcon.iconStream,
+                initialData: Container(),
+                builder: (BuildContext context, snapshot) {
+                  return snapshot.data;
+                },
+              ),
               onPressed: () {
                 screens.screenSink.add(Trips());
+                homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
+                personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
+                peopleIcon
+                    .changeIcon(Icon(Icons.people, color: Colors.blueAccent));
+                historyIcon
+                    .changeIcon(Icon(Icons.history, color: Colors.black));
               },
             ),
             IconButton(
-              icon: Icon(Icons.history),
+              icon: StreamBuilder(
+                stream: historyIcon.iconStream,
+                initialData: Container(),
+                builder: (BuildContext context, snapshot) {
+                  return snapshot.data;
+                },
+              ),
               onPressed: () {
                 screens.screenSink.add(History());
+                homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
+                personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
+                peopleIcon.changeIcon(Icon(Icons.people, color: Colors.black));
+                historyIcon
+                    .changeIcon(Icon(Icons.history, color: Colors.blueAccent));
               },
             ),
           ],
