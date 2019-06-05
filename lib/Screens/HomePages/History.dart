@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class History extends StatefulWidget {
+  History({this.user});
+
+  final FirebaseUser user;
+
   @override
   _HistoryState createState() => _HistoryState();
 }

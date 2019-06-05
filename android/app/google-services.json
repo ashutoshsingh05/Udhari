@@ -44,6 +44,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "518350271942-9baenmp9qce03pipl6ba99p4vob4vtrt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.udhari_2",
+            "certificate_hash": "70ef9d50713cda66d145361eea065f61858e6ae4"
+          }
+        },
+        {
           "client_id": "518350271942-nnlhkufehhtrltdn49p389s5ddje4ppk.apps.googleusercontent.com",
           "client_type": 3
         }

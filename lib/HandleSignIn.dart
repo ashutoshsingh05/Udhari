@@ -10,7 +10,7 @@ class HandleSignIn extends StatefulWidget {
 }
 
 class _HandleSignInState extends State<HandleSignIn> {
-  var firestore; // empty variable, I don't know what to do with it.
+  // var firestore; // empty variable, I don't know what to do with it.
   @override
   Widget build(BuildContext context) {
     // return new StreamBuilder<FirebaseUser>(
@@ -21,12 +21,13 @@ class _HandleSignInState extends State<HandleSignIn> {
     //       return SplashScreen();
     //     } else {
     //       if (snapshot.hasData) {
-    //         return new Dashboard(firestore: firestore, uuid: snapshot.data.uid);
+    //         return new Homepage(User: user, uuid: snapshot.data.uid);
     //       }
     //       return new Intro();
     //     }
     //   },
     // );
-    return HomePage();
+    // return HomePage();
+    return Intro();
   }
 }

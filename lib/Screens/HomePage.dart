@@ -11,9 +11,10 @@ import 'package:udhari_2/Widgets/Layout.dart';
 import 'package:udhari_2/Widgets/FabWithIcons.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.firestore, this.uuid});
+  HomePage({this.user});
 
-  final firestore, uuid;
+  // final firestore, uuid;
+  final FirebaseUser user;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -46,6 +47,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: CircleAvatar(
+          child: Image.network(""),
+        ),
         title: Text("Udhari"),
         actions: <Widget>[
           IconButton(
