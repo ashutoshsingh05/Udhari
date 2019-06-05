@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NormalUdhari extends StatefulWidget {
-  NormalUdhari({this.user});
+  NormalUdhari({@required this.user});
 
   final FirebaseUser user;
 

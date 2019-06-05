@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/HomePages/Dashboard.dart';
 import 'package:udhari_2/Screens/HomePages/Trips.dart';
 import 'package:udhari_2/Screens/HomePages/History.dart';
 import 'package:udhari_2/Screens/HomePages/NormalUdhari.dart';
+import 'package:udhari_2/Screens/Intro.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
 import 'package:udhari_2/Utils/IconHandler.dart';
 import 'package:udhari_2/Widgets/Layout.dart';
 import 'package:udhari_2/Widgets/FabWithIcons.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.user});
+  HomePage({@required this.user});
 
-  // final firestore, uuid;
   final FirebaseUser user;
 
   @override
@@ -21,7 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ScreenHandler screens = ScreenHandler(Dashboard());
+  ScreenHandler screens;
   IconHandler homeIcon =
       IconHandler(Icon(Icons.home, color: Colors.blueAccent));
   IconHandler personIcon = IconHandler(Icon(Icons.person));
@@ -31,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    screens = ScreenHandler(Dashboard(user: widget.user));
   }
 
   @override
@@ -47,20 +50,27 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: CircleAvatar(
-          child: Image.network(""),
+        leading: Padding(
+          padding: EdgeInsets.all(7),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage("${widget.user.photoUrl}"),
+          ),
         ),
         title: Text("Udhari"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.more_vert),
-            onPressed: () {},
+            onPressed: () {
+              _signOut();
+            },
           ),
         ],
       ),
       body: StreamBuilder(
         stream: screens.screenStream,
-        initialData: Container(),
+        initialData: Dashboard(
+          user: widget.user,
+        ),
         builder: (BuildContext context, snapshot) {
           return snapshot.data;
         },
@@ -80,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               onPressed: () {
-                screens.screenSink.add(Dashboard());
+                screens.screenSink.add(Dashboard(user: widget.user));
                 homeIcon.changeIcon(Icon(Icons.home, color: Colors.blueAccent));
                 personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
                 peopleIcon.changeIcon(Icon(Icons.people, color: Colors.black));
@@ -97,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               onPressed: () {
-                screens.screenSink.add(NormalUdhari());
+                screens.screenSink.add(NormalUdhari(user: widget.user));
                 homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
                 personIcon
                     .changeIcon(Icon(Icons.person, color: Colors.blueAccent));
@@ -118,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               onPressed: () {
-                screens.screenSink.add(Trips());
+                screens.screenSink.add(Trips(user: widget.user));
                 homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
                 personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
                 peopleIcon
@@ -136,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               onPressed: () {
-                screens.screenSink.add(History());
+                screens.screenSink.add(History(user: widget.user));
                 homeIcon.changeIcon(Icon(Icons.home, color: Colors.black));
                 personIcon.changeIcon(Icon(Icons.person, color: Colors.black));
                 peopleIcon.changeIcon(Icon(Icons.people, color: Colors.black));
@@ -154,6 +164,12 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: _buildFab(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  void _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    print("Logged out");
   }
 
   Widget _buildFab(BuildContext context) {

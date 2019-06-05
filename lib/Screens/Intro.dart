@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intro_slider/intro_slider.dart';
-import 'package:udhari_2/Screens/HomePage.dart';
 import 'package:udhari_2/Screens/Login.dart';
 
 class Intro extends StatefulWidget {
@@ -29,39 +28,31 @@ class _IntroState extends State<Intro> {
     );
     slides.add(
       new Slide(
-        title: "IN CHECK",
+        maxLineTitle: 2,
+        title: "EVERYTHING\nIN CHECK",
         pathImage: 'assets/checklist.png',
-        description:
-            "Monitor your expenses, keep your money in check ...\n\nNever lose a penny again!",
-        backgroundColor: Color(0xff9432CC),
+        description: "Monitor all your expenses. Never lose a penny again!",
+        backgroundColor: Colors.green,
       ),
     );
     slides.add(
       new Slide(
-        title: "Login or SignUp",
+        title: "GET STARTED!",
+        maxLineTitle: 2,
         centerWidget: Center(child: Login()),
-        description: "Login with your Google account to manage your expenses ",
-        backgroundColor: Color(0xff9932CC),
+        description:
+            "Login with your Google account to manage all your expenses\n\nSafe, Secure and Convenient.",
+        backgroundColor: Colors.deepOrangeAccent,
       ),
     );
   }
-
-  void onDonePressed() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => HomePage(),
-      ),
-    );
-  }
-
-  void onSkipPressed() {}
 
   @override
   Widget build(BuildContext context) {
     return IntroSlider(
       slides: slides,
-      onDonePress: onDonePressed,
+      onDonePress: null,
+      renderDoneBtn: SizedBox(),
       isScrollable: true,
       borderRadiusDoneBtn: 0,
       isShowPrevBtn: true,

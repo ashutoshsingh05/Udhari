@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Trips extends StatefulWidget {
-  Trips({this.user});
+  Trips({@required this.user});
 
   final FirebaseUser user;
 

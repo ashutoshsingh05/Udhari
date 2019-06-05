@@ -21,37 +21,25 @@ class _LoginState extends State<Login> {
     return Container(
       child: MaterialButton(
         onPressed: () {
-          _handleSignIn().then((FirebaseUser user) {
-            // print(user);
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (BuildContext context) {
-              return HomePage();
-            }));
+          _handleGoogleSignIn().then((FirebaseUser user) {
+            // print("Got User: ${user.displayName}");
           }).catchError((e) => print(e));
         },
-        child: Text("SignIn with Google"),
+        child: Text("Google SignIn"),
         color: Colors.white,
-        // shape: OutlineInputBorder(
-        //   borderRadius: BorderRadius.circular(10),
-        // ),
       ),
     );
   }
 
-  Future<FirebaseUser> _handleSignIn() async {
+  Future<FirebaseUser> _handleGoogleSignIn() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-    // final AuthCredential credential = GoogleAuthProvider.getCredential(
-    //   accessToken: googleAuth.accessToken,
-    //   idToken: googleAuth.idToken,
-    // );
     final FirebaseUser user = await _auth.signInWithGoogle(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    print("signed in " + user.displayName);
-    print("signed in user:  ${user.email}");
+    print("Signed in " + user.displayName + " with E mail " + user.email);
     return user;
   }
 }

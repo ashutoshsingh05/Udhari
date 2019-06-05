@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
-  Dashboard({this.user});
+  Dashboard({@required this.user});
 
   final FirebaseUser user;
 
