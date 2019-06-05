@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
+import 'package:udhari_2/Screens/Forms/NormalUdhariForm.dart';
+import 'package:udhari_2/Screens/Forms/TripsForm.dart';
 import 'package:udhari_2/Screens/HomePages/Dashboard.dart';
 import 'package:udhari_2/Screens/HomePages/Trips.dart';
 import 'package:udhari_2/Screens/HomePages/History.dart';
 import 'package:udhari_2/Screens/HomePages/NormalUdhari.dart';
-import 'package:udhari_2/Screens/Intro.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
 import 'package:udhari_2/Utils/IconHandler.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:udhari_2/Widgets/Layout.dart';
 import 'package:udhari_2/Widgets/FabWithIcons.dart';
 
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             backgroundImage: NetworkImage("${widget.user.photoUrl}"),
           ),
         ),
-        title: Text("Udhari"),
+        title: Text(widget.user.displayName),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.more_vert),
@@ -76,6 +77,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       bottomNavigationBar: BottomAppBar(
+        elevation: 5,
         shape: CircularNotchedRectangle(),
         notchMargin: 4.0,
         child: Row(
@@ -116,9 +118,9 @@ class _HomePageState extends State<HomePage> {
                     .changeIcon(Icon(Icons.history, color: Colors.black));
               },
             ),
-            SizedBox(
-              width: 50,
-            ),
+            // SizedBox(
+            //   width: 50,
+            // ),
             IconButton(
               icon: StreamBuilder(
                 stream: peopleIcon.iconStream,
@@ -157,12 +159,71 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
-      // FAB with Notched bottom appbar taken from https://github.com/bizz84/bottom_bar_fab_flutter
-      // by Andrea Bizzotto
-
-      floatingActionButton: _buildFab(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: SpeedDial(
+        marginRight: 18,
+        marginBottom: 20,
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        tooltip: 'MENU',
+        heroTag: 'speed-dial-hero-tag',
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 7.0,
+        shape: CircleBorder(),
+        children: [
+          SpeedDialChild(
+              child: Icon(Icons.attach_money),
+              backgroundColor: Colors.red,
+              label: 'Expenses',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) {
+                      return ExpensesForm(user: widget.user);
+                    },
+                  ),
+                );
+              }),
+          SpeedDialChild(
+            child: Icon(Icons.person_add),
+            backgroundColor: Colors.blue,
+            label: 'Udhari',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return NormalUdhariForm(user: widget.user);
+                  },
+                ),
+              );
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.group_add),
+            backgroundColor: Colors.green,
+            label: 'Trip',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return TripsForm(user: widget.user);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -170,29 +231,5 @@ class _HomePageState extends State<HomePage> {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
     print("Logged out");
-  }
-
-  Widget _buildFab(BuildContext context) {
-    final icons = [Icons.person_add, Icons.group_add, Icons.drive_eta];
-    return AnchoredOverlay(
-      showOverlay: true,
-      overlayBuilder: (context, offset) {
-        return CenterAbout(
-          position: Offset(offset.dx, offset.dy - icons.length * 35.0),
-          child: FabWithIcons(
-            icons: icons,
-            onIconTapped: (_) {
-              print("FAB index: $_");
-            },
-          ),
-        );
-      },
-      child: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Add',
-        child: Icon(Icons.add),
-        elevation: 2.0,
-      ),
-    );
   }
 }

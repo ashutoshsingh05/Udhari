@@ -18,15 +18,56 @@ class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: MaterialButton(
-        onPressed: () {
-          _handleGoogleSignIn().then((FirebaseUser user) {
-            // print("Got User: ${user.displayName}");
-          }).catchError((e) => print(e));
-        },
-        child: Text("Google SignIn"),
-        color: Colors.white,
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: <Widget>[
+          Image.asset("assets/google.png"),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+            child: Text(
+              "Sign In to sync your data across all your devices",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          MaterialButton(
+            height: 40,
+            color: Colors.white,
+            shape: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(7)),
+              borderSide: BorderSide(
+                color: Colors.white,
+                width: 0,
+              ),
+            ),
+            onPressed: () {
+              _handleGoogleSignIn().then((FirebaseUser user) {
+                print(
+                    "Signed in  ${user.displayName} with E mail  ${user.email}");
+              }).catchError((e) => print(e));
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundImage: AssetImage("assets/google.png"),
+                  backgroundColor: Colors.transparent,
+                  maxRadius: 12,
+                ),
+                SizedBox(
+                  width: 7,
+                ),
+                Text("Sign In with Google")
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -39,7 +80,6 @@ class _LoginState extends State<Login> {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    print("Signed in " + user.displayName + " with E mail " + user.email);
     return user;
   }
 }

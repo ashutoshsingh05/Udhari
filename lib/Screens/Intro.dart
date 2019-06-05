@@ -40,8 +40,8 @@ class _IntroState extends State<Intro> {
         title: "GET STARTED!",
         maxLineTitle: 2,
         centerWidget: Center(child: Login()),
-        description:
-            "Login with your Google account to manage all your expenses\n\nSafe, Secure and Convenient.",
+        // description:
+        //     "Login with your Google account to manage all your expenses\n\nSafe, Secure and Convenient.",
         backgroundColor: Colors.deepOrangeAccent,
       ),
     );
