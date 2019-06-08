@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:udhari_2/Screens/HomePage.dart';
+import 'package:udhari_2/Utils/LoginScreenHandler.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -9,6 +9,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  LoginScreenHandler screen;
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'email',
@@ -18,9 +20,10 @@ class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    Widget loginScreen = Padding(
       padding: EdgeInsets.all(20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Image.asset("assets/google.png"),
           Padding(
@@ -46,10 +49,14 @@ class _LoginState extends State<Login> {
               ),
             ),
             onPressed: () {
+              screen.showCircularProgressIndicator();
               _handleGoogleSignIn().then((FirebaseUser user) {
                 print(
-                    "Signed in  ${user.displayName} with E mail  ${user.email}");
-              }).catchError((e) => print(e));
+                    "Signed in ${user.displayName} with E mail ${user.email}");
+              }).catchError((e) {
+                print("Error signin in: $e");
+                screen.hideCircularProgressIndicator();
+              });
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,6 +76,15 @@ class _LoginState extends State<Login> {
           ),
         ],
       ),
+    );
+
+    screen = LoginScreenHandler(loginScreen);
+    return StreamBuilder(
+      initialData: loginScreen,
+      stream: screen.currentWidgetStream,
+      builder: (BuildContext context, snapshot) {
+        return snapshot.data;
+      },
     );
   }
 
