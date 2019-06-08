@@ -92,10 +92,14 @@ class _LoginState extends State<Login> {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-    final FirebaseUser user = await _auth.signInWithGoogle(
+    AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
+    final FirebaseUser user = await _auth.signInWithCredential(credential
+        // accessToken: googleAuth.accessToken,
+        // idToken: googleAuth.idToken,
+        );
     return user;
   }
 }
