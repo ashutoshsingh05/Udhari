@@ -174,9 +174,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
     if (_formKey.currentState.validate() == true) {
       _formKey.currentState.save();
 
-  // Firestore firestore = Firestore.instance;
-  // var settings = FirebaseFirestoreSettings.Builder().
-    
+      // Firestore firestore = Firestore.instance;
+      // var settings = FirebaseFirestoreSettings.Builder().
 
       DocumentReference database = Firestore.instance
           .collection("${widget.user.uid}")
@@ -187,6 +186,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
         "Context": contextController.text,
       }).then((onValue) {
         print("Data Successfully saved to cloud!");
+        dateController.clear();
+        amountController.clear();
+        contextController.clear();
       }).catchError((e) {
         print("Error occured: $e");
       });
