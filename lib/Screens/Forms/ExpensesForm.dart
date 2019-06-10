@@ -6,6 +6,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Utils/DisplayOverlayhandler.dart';
+import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class ExpensesForm extends StatefulWidget {
   ExpensesForm({@required this.user});
@@ -42,6 +43,12 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    display.close();
+    super.dispose();
   }
 
   @override
@@ -137,9 +144,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
                     autocorrect: true,
                     maxLines: null,
                     focusNode: contextFocus,
-                    onFieldSubmitted: (_) {
-                      // _validateAndSave();
-                    },
                     validator: (value) {
                       if (value.isEmpty) {
                         return "Context cannot be empty!";
@@ -189,35 +193,44 @@ class _ExpensesFormState extends State<ExpensesForm> {
         display.display(stack);
         _formKey.currentState.save();
 
-        DocumentReference database = Firestore.instance
+        Expenses expenses = Expenses(
+          dateTime: dateController.text,
+          amount: double.parse(amountController.text),
+          context: contextController.text,
+          personName: "Me",
+        );
+
+        await Firestore.instance
             .collection("${widget.user.uid}")
-            .document("Expenses");
-        await database.setData({
-          "DateTime": dateController.text,
-          "Amount": amountController.text,
-          "Context": contextController.text,
-        }).then((onValue) {
+            .document()
+            .collection('Expenses')
+            .document('${DateTime.now().millisecondsSinceEpoch.toString()}')
+            .setData(expenses.toJson())
+            .then((_) {
           print("Data Successfully saved to cloud!");
+          _formKey.currentState.reset();
           display.display(background);
           Navigator.pop(context);
         }).catchError((e) {
           display.display(background);
           print("Error occured: $e");
           return showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              });
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Text("Error: $e"),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         });
       } else {
         print("Form data NOT saved");

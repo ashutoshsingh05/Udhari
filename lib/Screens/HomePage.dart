@@ -8,6 +8,8 @@ import 'package:udhari_2/Screens/Forms/TripsForm.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 class HomePage extends StatefulWidget {
   HomePage({@required this.user});
 
@@ -30,8 +32,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    screens.close();
     super.dispose();
-    screens.screenController.close();
   }
 
   @override
@@ -41,7 +43,8 @@ class _HomePageState extends State<HomePage> {
         leading: Padding(
           padding: EdgeInsets.all(7),
           child: CircleAvatar(
-            backgroundImage: NetworkImage("${widget.user.photoUrl}"),
+            backgroundImage:
+                CachedNetworkImageProvider("${widget.user.photoUrl}"),
           ),
         ),
         title: Text(widget.user.displayName),

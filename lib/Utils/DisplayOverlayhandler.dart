@@ -9,11 +9,16 @@ class DisplayHandler {
 
   Widget currentWidgets;
 
-  StreamController displayControler = StreamController();
-  Sink get displaySink => displayControler.sink;
-  Stream get displayStream => displayControler.stream;
+  StreamController displayController = StreamController();
+  Sink get displaySink => displayController.sink;
+  Stream get displayStream => displayController.stream;
 
   void display(Widget newWidget) {
     displaySink.add(newWidget);
+  }
+
+  void close() {
+    displaySink.close();
+    displayController.close();
   }
 }

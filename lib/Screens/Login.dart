@@ -14,6 +14,17 @@ class _LoginState extends State<Login> {
   Widget circularIndicator;
   Widget stack;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    screen.close();
+    super.dispose();
+  }
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'email',

@@ -39,4 +39,9 @@ class ScreenHandler {
         break;
     }
   }
+
+  void close() {
+    screenSink.close();
+    screenController.close();
+  }
 }

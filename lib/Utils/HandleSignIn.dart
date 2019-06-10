@@ -15,7 +15,6 @@ class _HandleSignInState extends State<HandleSignIn> {
     return new StreamBuilder<FirebaseUser>(
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (BuildContext context, snapshot) {
-        // print("Snapshot: ${snapshot.data}");
         if (snapshot.connectionState == ConnectionState.waiting ||
             snapshot.connectionState == ConnectionState.none) {
           return SplashScreen();
