@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:udhari_2/Utils/DisplayOverlayhandler.dart';
 
 class ExpensesForm extends StatefulWidget {
   ExpensesForm({@required this.user});
@@ -15,6 +17,12 @@ class ExpensesForm extends StatefulWidget {
 }
 
 class _ExpensesFormState extends State<ExpensesForm> {
+  DisplayHandler display;
+
+  Widget foreground;
+  Widget background;
+  Widget stack;
+
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController dateController = TextEditingController();
@@ -38,162 +46,199 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
   @override
   Widget build(BuildContext context) {
+    display = DisplayHandler(background);
+
+    background = SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: <Widget>[
+          Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: DateTimePickerFormField(
+                    initialDate: DateTime.now(),
+                    initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                    maxLines: null,
+                    controller: dateController,
+                    inputType: InputType.both,
+                    format: formats[InputType.both],
+                    editable: false,
+                    focusNode: dateFocus,
+                    onChanged: (_) {
+                      FocusScope.of(context).requestFocus(amountFocus);
+                    },
+                    validator: (value) {
+                      if (value == null || value.toString() == "") {
+                        return "Date cannot be empty!";
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.calendar_today),
+                      labelText: 'Date/Time',
+                      hasFloatingPlaceholder: true,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 80, maxWidth: 200),
+                    child: TextFormField(
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                      enableInteractiveSelection: false,
+                      textInputAction: TextInputAction.next,
+                      focusNode: amountFocus,
+                      onFieldSubmitted: (_) {
+                        FocusScope.of(context).requestFocus(contextFocus);
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Amount cannot be empty!";
+                        }
+                        int decimalCount = 0, i = 0;
+                        while (i < value.length) {
+                          if (value[i] == '.') {
+                            decimalCount++;
+                            if (decimalCount > 1) {
+                              return "Invalid Amount format!";
+                            }
+                          }
+                          i++;
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              amountController.clear();
+                            },
+                          ),
+                          icon: Icon(Icons.attach_money),
+                          labelText: "Amount"),
+                      inputFormatters: [
+                        WhitelistingTextInputFormatter(RegExp("[0-9\.]")),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: TextFormField(
+                    controller: contextController,
+                    keyboardType: TextInputType.text,
+                    maxLength: 120,
+                    autocorrect: true,
+                    maxLines: null,
+                    focusNode: contextFocus,
+                    onFieldSubmitted: (_) {
+                      // _validateAndSave();
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Context cannot be empty!";
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          amountController.clear();
+                        },
+                      ),
+                      icon: Icon(Icons.event_note),
+                      labelText: "Context",
+                    ),
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(
+                        RegExp("[a-zA-Z0-9\$\.\(\)\@\#\%\&\-\+\,\_\=\;\"\ ]"),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    foreground = Container(
+      color: Color.fromRGBO(0, 0, 0, 0.4),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    stack = Stack(
+      children: <Widget>[
+        background,
+        foreground,
+      ],
+    );
+
+    void _validateAndSave() async {
+      if (_formKey.currentState.validate() == true) {
+        display.display(stack);
+        _formKey.currentState.save();
+
+        DocumentReference database = Firestore.instance
+            .collection("${widget.user.uid}")
+            .document("Expenses");
+        await database.setData({
+          "DateTime": dateController.text,
+          "Amount": amountController.text,
+          "Context": contextController.text,
+        }).then((onValue) {
+          print("Data Successfully saved to cloud!");
+          display.display(background);
+          Navigator.pop(context);
+        }).catchError((e) {
+          display.display(background);
+          print("Error occured: $e");
+          return showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              });
+        });
+      } else {
+        print("Form data NOT saved");
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Expenses"),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: <Widget>[
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: DateTimePickerFormField(
-                      initialDate: DateTime.now(),
-                      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-                      maxLines: null,
-                      controller: dateController,
-                      inputType: InputType.both,
-                      format: formats[InputType.both],
-                      editable: false,
-                      focusNode: dateFocus,
-                      onChanged: (_) {
-                        FocusScope.of(context).requestFocus(amountFocus);
-                      },
-                      validator: (value) {
-                        if (value == null || value.toString() == "") {
-                          return "Date cannot be empty!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.calendar_today),
-                        labelText: 'Date/Time',
-                        hasFloatingPlaceholder: true,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 80, maxWidth: 200),
-                      child: TextFormField(
-                        controller: amountController,
-                        keyboardType: TextInputType.number,
-                        enableInteractiveSelection: false,
-                        textInputAction: TextInputAction.next,
-                        focusNode: amountFocus,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(contextFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return "Amount cannot be empty!";
-                          }
-                          int decimalCount = 0, i = 0;
-                          while (i < value.length) {
-                            if (value[i] == '.') {
-                              decimalCount++;
-                              if (decimalCount > 1) {
-                                return "Invalid Amount format!";
-                              }
-                            }
-                            i++;
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.close),
-                              onPressed: () {
-                                amountController.clear();
-                              },
-                            ),
-                            icon: Icon(Icons.attach_money),
-                            labelText: "Amount"),
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter(RegExp("[0-9\.]")),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: TextFormField(
-                      controller: contextController,
-                      keyboardType: TextInputType.text,
-                      maxLength: 120,
-                      autocorrect: true,
-                      maxLines: null,
-                      focusNode: contextFocus,
-                      onFieldSubmitted: (_) {
-                        _validateAndSave();
-                      },
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Context cannot be empty!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () {
-                            amountController.clear();
-                          },
-                        ),
-                        icon: Icon(Icons.event_note),
-                        labelText: "Context",
-                      ),
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter(
-                          RegExp("[a-zA-Z0-9\$\.\(\)\@\#\%\&\-\+\,\_\=\;\"\ ]"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: StreamBuilder(
+        initialData: background,
+        stream: display.displayStream,
+        builder: (BuildContext context, snapshot) {
+          return snapshot.data;
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _validateAndSave,
         child: Icon(Icons.check),
       ),
     );
-  }
-
-  void _validateAndSave() async {
-    if (_formKey.currentState.validate() == true) {
-      _formKey.currentState.save();
-
-      // Firestore firestore = Firestore.instance;
-      // var settings = FirebaseFirestoreSettings.Builder().
-
-      DocumentReference database = Firestore.instance
-          .collection("${widget.user.uid}")
-          .document("Expenses");
-      await database.setData({
-        "DateTime": dateController.text,
-        "Amount": amountController.text,
-        "Context": contextController.text,
-      }).then((onValue) {
-        print("Data Successfully saved to cloud!");
-        dateController.clear();
-        amountController.clear();
-        contextController.clear();
-      }).catchError((e) {
-        print("Error occured: $e");
-      });
-    } else {
-      print("Form data NOT saved");
-    }
   }
 }

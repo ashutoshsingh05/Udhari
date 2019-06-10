@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:udhari_2/Utils/LoginScreenHandler.dart';
+import 'package:udhari_2/Utils/DisplayOverlayhandler.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -9,7 +9,10 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  LoginScreenHandler screen;
+  DisplayHandler screen;
+  Widget loginScreen;
+  Widget circularIndicator;
+  Widget stack;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
@@ -20,7 +23,9 @@ class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    Widget loginScreen = Padding(
+    screen = DisplayHandler(loginScreen);
+
+    loginScreen = Padding(
       padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,13 +54,13 @@ class _LoginState extends State<Login> {
               ),
             ),
             onPressed: () {
-              screen.showCircularProgressIndicator();
+              screen.display(stack);
               _handleGoogleSignIn().then((FirebaseUser user) {
                 print(
                     "Signed in ${user.displayName} with E mail ${user.email}");
               }).catchError((e) {
+                screen.display(loginScreen);
                 print("Error signin in: $e");
-                screen.hideCircularProgressIndicator();
               });
             },
             child: Row(
@@ -78,10 +83,23 @@ class _LoginState extends State<Login> {
       ),
     );
 
-    screen = LoginScreenHandler(loginScreen);
+    circularIndicator = Container(
+      padding: EdgeInsets.only(top: 140),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    stack = Stack(
+      children: <Widget>[
+        loginScreen,
+        circularIndicator,
+      ],
+    );
+
     return StreamBuilder(
       initialData: loginScreen,
-      stream: screen.currentWidgetStream,
+      stream: screen.displayStream,
       builder: (BuildContext context, snapshot) {
         return snapshot.data;
       },
@@ -96,10 +114,7 @@ class _LoginState extends State<Login> {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    final FirebaseUser user = await _auth.signInWithCredential(credential
-        // accessToken: googleAuth.accessToken,
-        // idToken: googleAuth.idToken,
-        );
+    final FirebaseUser user = await _auth.signInWithCredential(credential);
     return user;
   }
 }
