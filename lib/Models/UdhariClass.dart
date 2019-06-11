@@ -16,9 +16,11 @@ class Udhari {
 
   toJson() {
     return {
-      "udhari": udhari,
+      "dateTime": udhari.dateTime,
+      "amount": udhari.amount,
+      "context": udhari.context,
+      "personName": udhari.personName,
       "isBorrowed": isBorrowed,
     };
   }
 }
-

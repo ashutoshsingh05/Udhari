@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:udhari_2/Utils/DisplayOverlayhandler.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -9,19 +8,25 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  DisplayHandler screen;
-  Widget loginScreen;
-  Widget circularIndicator;
-  Widget stack;
+  OverlayEntry _overlayEntry;
 
   @override
   void initState() {
+    _overlayEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Container(
+          color: Color.fromRGBO(0, 0, 0, 0.4),
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+    );
     super.initState();
   }
 
   @override
   void dispose() {
-    screen.close();
     super.dispose();
   }
 
@@ -35,9 +40,7 @@ class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    screen = DisplayHandler(loginScreen);
-
-    loginScreen = Padding(
+    return Padding(
       padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,12 +69,13 @@ class _LoginState extends State<Login> {
               ),
             ),
             onPressed: () {
-              screen.display(stack);
+              Overlay.of(context).insert(_overlayEntry);
               _handleGoogleSignIn().then((FirebaseUser user) {
                 print(
                     "Signed in ${user.displayName} with E mail ${user.email}");
+                _overlayEntry.remove();
               }).catchError((e) {
-                screen.display(loginScreen);
+                _overlayEntry.remove();
                 print("Error signin in: $e");
               });
             },
@@ -95,27 +99,13 @@ class _LoginState extends State<Login> {
       ),
     );
 
-    circularIndicator = Container(
-      padding: EdgeInsets.only(top: 140),
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
-    stack = Stack(
-      children: <Widget>[
-        loginScreen,
-        circularIndicator,
-      ],
-    );
-
-    return StreamBuilder(
-      initialData: loginScreen,
-      stream: screen.displayStream,
-      builder: (BuildContext context, snapshot) {
-        return snapshot.data;
-      },
-    );
+    // return StreamBuilder(
+    //   initialData: loginScreen,
+    //   stream: screen.displayStream,
+    //   builder: (BuildContext context, snapshot) {
+    //     return snapshot.data;
+    //   },
+    // );
   }
 
   Future<FirebaseUser> _handleGoogleSignIn() async {
