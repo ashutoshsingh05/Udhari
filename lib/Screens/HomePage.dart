@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
 import 'package:udhari_2/Screens/Forms/NormalUdhariForm.dart';
@@ -109,21 +108,21 @@ class _HomePageState extends State<HomePage> {
         shape: CircleBorder(),
         children: [
           SpeedDialChild(
-              child: Icon(Icons.attach_money),
-              backgroundColor: Colors.red,
-              label: 'Expenses',
-              labelStyle: TextStyle(fontSize: 18.0),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    fullscreenDialog: true,
-                    builder: (BuildContext context) {
-                      return ExpensesForm(user: widget.user);
-                    },
-                  ),
-                );
-              }),
+            child: Icon(Icons.attach_money),
+            backgroundColor: Colors.red,
+            label: 'Expenses',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return ExpensesForm(user: widget.user);
+                  },
+                ),
+              );
+            },
+          ),
           SpeedDialChild(
             child: Icon(Icons.person_add),
             backgroundColor: Colors.blue,
@@ -133,7 +132,6 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  fullscreenDialog: true,
                   builder: (BuildContext context) {
                     return NormalUdhariForm(user: widget.user);
                   },
@@ -150,7 +148,6 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  fullscreenDialog: true,
                   builder: (BuildContext context) {
                     return TripsForm(user: widget.user);
                   },

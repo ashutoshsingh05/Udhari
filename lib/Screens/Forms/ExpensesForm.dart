@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,10 +19,6 @@ class ExpensesForm extends StatefulWidget {
 class _ExpensesFormState extends State<ExpensesForm> {
   DisplayHandler display;
 
-  Widget foreground;
-  Widget background;
-  Widget stack;
-
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController dateController = TextEditingController();
@@ -41,11 +36,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
   };
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     display.close();
     super.dispose();
@@ -53,7 +43,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
   @override
   Widget build(BuildContext context) {
-    display = DisplayHandler(background);
+    Widget foreground;
+    Widget background;
+    Widget stack;
 
     background = SingleChildScrollView(
       padding: EdgeInsets.all(20),
@@ -85,7 +77,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
                       return null;
                     },
                     decoration: InputDecoration(
-                      icon: Icon(Icons.calendar_today),
+                      icon: Icon(Icons.today),
                       labelText: 'Date/Time',
                       hasFloatingPlaceholder: true,
                     ),
@@ -188,6 +180,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
       ],
     );
 
+    display = DisplayHandler(background);
+
     void _validateAndSave() async {
       if (_formKey.currentState.validate() == true) {
         display.display(stack);
@@ -201,8 +195,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
         );
 
         await Firestore.instance
-            .collection("${widget.user.uid}")
-            .document()
+            .collection('Users 2.0')
+            .document("${widget.user.uid}")
             .collection('Expenses')
             .document('${DateTime.now().millisecondsSinceEpoch.toString()}')
             .setData(expenses.toJson())

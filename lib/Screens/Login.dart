@@ -28,6 +28,7 @@ class _LoginState extends State<Login> {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'email',
+      'https://www.googleapis.com/auth/user.phonenumbers.read',
       'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
