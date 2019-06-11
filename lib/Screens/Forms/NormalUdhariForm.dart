@@ -20,7 +20,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
   Expenses expenses;
   Udhari udhari;
 
-  var dropDownValue;
+  var dropDownButtonValue;
 
   OverlayEntry _overlayEntry;
 
@@ -31,7 +31,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
   TextEditingController amountController = TextEditingController();
   TextEditingController personNameController = TextEditingController();
 
-  FocusNode dateFocus = FocusNode();
+  // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
   FocusNode personNameFocus = FocusNode();
@@ -85,10 +85,10 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                         maxWidth: 160,
                       ),
                       child: DropdownButtonFormField(
-                        value: dropDownValue,
+                        value: dropDownButtonValue,
                         onChanged: (newValue) {
                           setState(() {
-                            dropDownValue = newValue;
+                            dropDownButtonValue = newValue;
                             print("Changed to new Value: $newValue");
                           });
                         },
@@ -120,9 +120,14 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       controller: personNameController,
                       keyboardType: TextInputType.text,
                       maxLength: 30,
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
                       autocorrect: true,
                       maxLines: 1,
                       focusNode: personNameFocus,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(amountFocus);
+                      },
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Name cannot be empty!";
@@ -157,12 +162,15 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                         textInputAction: TextInputAction.next,
                         focusNode: amountFocus,
                         maxLength: 6,
-                        onFieldSubmitted: (_) {
+                        onEditingComplete: () {
                           FocusScope.of(context).requestFocus(contextFocus);
                         },
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Amount cannot be empty!";
+                          }
+                          if (double.parse(value) > 100000) {
+                            return "Amount is too large!";
                           }
                           int decimalCount = 0, i = 0;
                           while (i < value.length) {
@@ -198,8 +206,12 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       keyboardType: TextInputType.text,
                       maxLength: 120,
                       autocorrect: true,
+                      textCapitalization: TextCapitalization.sentences,
                       maxLines: null,
                       focusNode: contextFocus,
+                      // onEditingComplete: () {
+                      //   FocusScope.of(context).requestFocus(dateFocus);
+                      // },
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Context cannot be empty!";
@@ -233,16 +245,13 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       inputType: InputType.both,
                       format: formats[InputType.both],
                       editable: false,
-                      focusNode: dateFocus,
-                      onChanged: (_) {
-                        FocusScope.of(context).requestFocus(amountFocus);
-                      },
-                      validator: (value) {
-                        if (value == null || value.toString() == "") {
-                          return "Date cannot be empty!";
-                        }
-                        return null;
-                      },
+                      // focusNode: dateFocus,
+                      // validator: (value) {
+                      //   if (value == null || value.toString() == "") {
+                      //     return "Date cannot be empty!";
+                      //   }
+                      //   return null;
+                      // },
                       decoration: InputDecoration(
                         helperText: "(Optional)",
                         icon: Icon(Icons.today),
@@ -270,15 +279,20 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
       _formKey.currentState.save();
 
       expenses = Expenses(
-        dateTime: dateController.text,
+        dateTime: dateController.text == ""
+            ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")
+                .format(DateTime.now())
+                .toString()
+            : dateController.text,
         amount: double.parse(amountController.text),
         context: contextController.text,
         personName: personNameController.text,
       );
 
       udhari = Udhari(
-          udhari: expenses,
-          isBorrowed: dropDownValue == "Borrowed" ? true : false);
+        udhari: expenses,
+        isBorrowed: dropDownButtonValue == "Borrowed" ? true : false,
+      );
 
       await Firestore.instance
           .collection('Users 2.0')

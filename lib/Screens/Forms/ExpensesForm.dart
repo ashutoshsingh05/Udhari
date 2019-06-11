@@ -24,7 +24,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
   TextEditingController contextController = TextEditingController();
   TextEditingController amountController = TextEditingController();
 
-  FocusNode dateFocus = FocusNode();
+  // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
 
@@ -71,47 +71,24 @@ class _ExpensesFormState extends State<ExpensesForm> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    child: DateTimePickerFormField(
-                      initialDate: DateTime.now(),
-                      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-                      maxLines: null,
-                      controller: dateController,
-                      inputType: InputType.both,
-                      format: formats[InputType.both],
-                      editable: false,
-                      focusNode: dateFocus,
-                      onChanged: (_) {
-                        FocusScope.of(context).requestFocus(amountFocus);
-                      },
-                      validator: (value) {
-                        if (value == null || value.toString() == "") {
-                          return "Date cannot be empty!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.today),
-                        labelText: 'Date/Time',
-                        hasFloatingPlaceholder: true,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: 80, maxWidth: 200),
                       child: TextFormField(
                         controller: amountController,
                         keyboardType: TextInputType.number,
+                        autofocus: true,
                         enableInteractiveSelection: false,
                         textInputAction: TextInputAction.next,
                         focusNode: amountFocus,
-                        onFieldSubmitted: (_) {
+                        onEditingComplete: () {
                           FocusScope.of(context).requestFocus(contextFocus);
                         },
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Amount cannot be empty!";
+                          }
+                          if (double.parse(value) > 100000) {
+                            return "Amount is too large!";
                           }
                           int decimalCount = 0, i = 0;
                           while (i < value.length) {
@@ -141,11 +118,13 @@ class _ExpensesFormState extends State<ExpensesForm> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: EdgeInsets.only(top: 20, bottom: 5),
                     child: TextFormField(
                       controller: contextController,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
                       maxLength: 120,
+                      textCapitalization: TextCapitalization.sentences,
                       autocorrect: true,
                       maxLines: null,
                       focusNode: contextFocus,
@@ -172,6 +151,34 @@ class _ExpensesFormState extends State<ExpensesForm> {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: DateTimePickerFormField(
+                      initialDate: DateTime.now(),
+                      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                      maxLines: null,
+                      controller: dateController,
+                      inputType: InputType.both,
+                      format: formats[InputType.both],
+                      editable: false,
+                      // focusNode: dateFocus,
+                      // onChanged: (_) {
+                      //   FocusScope.of(context).requestFocus(amountFocus);
+                      // },
+                      // validator: (value) {
+                      //   if (value == null || value.toString() == "") {
+                      //     return "Date cannot be empty!";
+                      //   }
+                      //   return null;
+                      // },
+                      decoration: InputDecoration(
+                        helperText: "(Optional)",
+                        icon: Icon(Icons.today),
+                        labelText: 'Date/Time',
+                        hasFloatingPlaceholder: true,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -191,7 +198,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
       _formKey.currentState.save();
 
       Expenses expenses = Expenses(
-        dateTime: dateController.text,
+        dateTime: dateController.text == ""
+            ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma").format(DateTime.now())
+            : dateController.text,
         amount: double.parse(amountController.text),
         context: contextController.text,
         personName: "Me",
