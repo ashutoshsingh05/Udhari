@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -73,6 +74,7 @@ class _LoginState extends State<Login> {
               _handleGoogleSignIn().then((FirebaseUser user) {
                 print(
                     "Signed in ${user.displayName} with E mail ${user.email}");
+                _setBasicData(user);
                 _overlayEntry.remove();
               }).catchError((e) {
                 _overlayEntry.remove();
@@ -98,14 +100,6 @@ class _LoginState extends State<Login> {
         ],
       ),
     );
-
-    // return StreamBuilder(
-    //   initialData: loginScreen,
-    //   stream: screen.displayStream,
-    //   builder: (BuildContext context, snapshot) {
-    //     return snapshot.data;
-    //   },
-    // );
   }
 
   Future<FirebaseUser> _handleGoogleSignIn() async {
@@ -118,5 +112,16 @@ class _LoginState extends State<Login> {
     );
     final FirebaseUser user = await _auth.signInWithCredential(credential);
     return user;
+  }
+
+  void _setBasicData(FirebaseUser user) async {
+    await Firestore.instance
+        .collection('Users 2.0')
+        .document(user.uid)
+        .setData({
+      "Name": user.displayName,
+      "Email": user.email,
+      "PhoneNumber": user.phoneNumber,
+    });
   }
 }

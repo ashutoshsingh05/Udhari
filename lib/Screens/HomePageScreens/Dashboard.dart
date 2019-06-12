@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({@required this.user});
@@ -27,8 +28,21 @@ class _DashboardState extends State<Dashboard> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(10, 10, 5, 5),
                   child: Card(
-                    child: Center(
-                      child: Text("Total Debit:"),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text("Total Debit"),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "0",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
