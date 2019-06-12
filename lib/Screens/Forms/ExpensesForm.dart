@@ -7,9 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class ExpensesForm extends StatefulWidget {
-  ExpensesForm({@required this.user});
+  ExpensesForm({
+    @required this.user,
+    this.amountOpt,
+    this.contextOpt,
+    this.dateTimeOpt,
+  });
 
   final FirebaseUser user;
+  final double amountOpt;
+  final String contextOpt;
+  final String dateTimeOpt;
 
   @override
   _ExpensesFormState createState() => _ExpensesFormState();
@@ -37,6 +45,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   void initState() {
     super.initState();
+    dateController.text = widget.dateTimeOpt;
+    contextController.text = widget.contextOpt;
+    amountController.text = (widget.amountOpt).toString();
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         return Container(

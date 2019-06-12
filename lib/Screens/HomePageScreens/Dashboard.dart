@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({@required this.user});
@@ -70,15 +71,21 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text("Total Debit"),
+                        Text(
+                          "Total Debit",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                          ),
+                        ),
                         SizedBox(
                           height: 3,
                         ),
                         Text(
                           "0",
                           style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -88,24 +95,84 @@ class _DashboardState extends State<Dashboard> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 10, 5),
                   child: Card(
-                    child: Center(
-                      child: Text("Total Credit:"),
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Total Credit",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "0",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(10, 5, 5, 10),
                   child: Card(
-                    child: Center(
-                      child: Text("Total Expenses:"),
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Total Expenses",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "0",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 5, 10, 10),
                   child: Card(
-                    child: Center(
-                      child: Text("Active Trips::"),
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Active Trips",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "0",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -119,6 +186,7 @@ class _DashboardState extends State<Dashboard> {
                     .collection('Users 2.0')
                     .document('${widget.user.uid}')
                     .collection('Expenses')
+                    // .orderBy("", descending: true)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -163,58 +231,55 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _cardBuilder(double amount, String context, String dateTime) {
+  Widget _cardBuilder(double amount, String expenseContext, String dateTime) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 1),
-      child: Card(
-        elevation: 5,
-        shape: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: Icon(
-                Icons.tag_faces,
-                color: Colors.red,
-              ),
-              title: Text(
-                "$context",
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 8, 0, 1),
-                    ),
-                    Text("$dateTime"),
-                  ],
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: GestureDetector(
+        onTap: () {
+          _editCard(amount, expenseContext, dateTime);
+        },
+        child: Card(
+          elevation: 5,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundImage:
+                      CachedNetworkImageProvider("${widget.user.photoUrl}"),
                 ),
-              ),
-              trailing: SizedBox(
-                child: Text(
-                  '₹$amount',
-                  textScaleFactor: 1.3,
+                title: Text(
+                  "$expenseContext",
+                  overflow: TextOverflow.ellipsis,
                 ),
-                width: 80,
-              ),
-            ),
-            ButtonTheme.bar(
-              child: ButtonBar(
-                children: <Widget>[
-                  FlatButton(
-                    child: const Text('Edit'),
-                    onPressed: () {},
+                subtitle: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Text(
+                        "$dateTime",
+                        textScaleFactor: 0.9,
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                trailing: SizedBox(
+                  width: 80,
+                  child: Center(
+                    child: Text(
+                      '₹${amount.floor()}',
+                      textScaleFactor: 1.3,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -224,5 +289,21 @@ class _DashboardState extends State<Dashboard> {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
     print("Logged out");
+  }
+
+  void _editCard(double amount, String expenseContext, String datetime) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ExpensesForm(
+            user: widget.user,
+            amountOpt: amount,
+            contextOpt: expenseContext,
+            dateTimeOpt: datetime,
+          );
+        },
+      ),
+    );
   }
 }
