@@ -7,9 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class ExpensesForm extends StatefulWidget {
-  ExpensesForm({@required this.user});
+  ExpensesForm({
+    @required this.user,
+    this.amountOpt,
+    this.contextOpt,
+    this.dateTimeOpt,
+  });
 
   final FirebaseUser user;
+  final double amountOpt;
+  final String contextOpt;
+  final String dateTimeOpt;
 
   @override
   _ExpensesFormState createState() => _ExpensesFormState();
@@ -24,7 +32,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
   TextEditingController contextController = TextEditingController();
   TextEditingController amountController = TextEditingController();
 
-  FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
 
@@ -37,6 +44,10 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   void initState() {
     super.initState();
+    dateController.text = widget.dateTimeOpt;
+    contextController.text = widget.contextOpt;
+    amountController.text =
+        (widget.amountOpt) == null ? "" : widget.amountOpt.toString();
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         return Container(
@@ -161,16 +172,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
                       inputType: InputType.both,
                       format: formats[InputType.both],
                       editable: false,
-                      focusNode: dateFocus,
-                      // onChanged: (_) {
-                      //   FocusScope.of(context).requestFocus(amountFocus);
-                      // },
-                      // validator: (value) {
-                      //   if (value == null || value.toString() == "") {
-                      //     return "Date cannot be empty!";
-                      //   }
-                      //   return null;
-                      // },
                       decoration: InputDecoration(
                         helperText: "(Optional)",
                         icon: Icon(Icons.today),

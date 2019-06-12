@@ -31,7 +31,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
   TextEditingController amountController = TextEditingController();
   TextEditingController personNameController = TextEditingController();
 
-  FocusNode dateFocus = FocusNode();
+  // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
   FocusNode personNameFocus = FocusNode();
@@ -121,6 +121,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       keyboardType: TextInputType.text,
                       maxLength: 30,
                       textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
                       autocorrect: true,
                       maxLines: 1,
                       focusNode: personNameFocus,
@@ -208,9 +209,9 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       textCapitalization: TextCapitalization.sentences,
                       maxLines: null,
                       focusNode: contextFocus,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(dateFocus);
-                      },
+                      // onEditingComplete: () {
+                      //   FocusScope.of(context).requestFocus(dateFocus);
+                      // },
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Context cannot be empty!";
@@ -244,7 +245,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
                       inputType: InputType.both,
                       format: formats[InputType.both],
                       editable: false,
-                      focusNode: dateFocus,
+                      // focusNode: dateFocus,
                       // validator: (value) {
                       //   if (value == null || value.toString() == "") {
                       //     return "Date cannot be empty!";
