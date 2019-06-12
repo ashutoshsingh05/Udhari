@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({@required this.user});
@@ -14,20 +16,57 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            Colors.blueAccent,
+            Colors.black,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          AppBar(
+            backgroundColor: Colors.transparent.withOpacity(0),
+            elevation: 0,
+            leading: Padding(
+              padding: EdgeInsets.all(7),
+              child: CircleAvatar(
+                backgroundImage:
+                    CachedNetworkImageProvider("${widget.user.photoUrl}"),
+              ),
+            ),
+            title: Text(widget.user.displayName),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.more_vert),
+                onPressed: () {
+                  _signOut();
+                },
+              ),
+            ],
+          ),
           Container(
-            height: 200,
+            height: 230,
             child: GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.8,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.fromLTRB(10, 10, 5, 5),
+                  padding: EdgeInsets.fromLTRB(10, 0, 5, 5),
                   child: Card(
+                    elevation: 5,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -47,7 +86,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(5, 10, 10, 5),
+                  padding: EdgeInsets.fromLTRB(5, 0, 10, 5),
                   child: Card(
                     child: Center(
                       child: Text("Total Credit:"),
@@ -128,7 +167,10 @@ class _DashboardState extends State<Dashboard> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 1),
       child: Card(
-        elevation: 2,
+        elevation: 5,
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -159,7 +201,7 @@ class _DashboardState extends State<Dashboard> {
                   '₹$amount',
                   textScaleFactor: 1.3,
                 ),
-                width: 65,
+                width: 80,
               ),
             ),
             ButtonTheme.bar(
@@ -176,5 +218,11 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
     );
+  }
+
+  void _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    print("Logged out");
   }
 }

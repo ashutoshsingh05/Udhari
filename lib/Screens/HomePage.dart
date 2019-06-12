@@ -38,24 +38,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.all(7),
-          child: CircleAvatar(
-            backgroundImage:
-                CachedNetworkImageProvider("${widget.user.photoUrl}"),
-          ),
-        ),
-        title: Text(widget.user.displayName),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_vert),
-            onPressed: () {
-              _signOut();
-            },
-          ),
-        ],
-      ),
+      backgroundColor: Colors.transparent,
+      // appBar: AppBar(
+      //   // backgroundColor: Colors.transparent,
+      //   leading: Padding(
+      //     padding: EdgeInsets.all(7),
+      //     child: CircleAvatar(
+      //       backgroundImage:
+      //           CachedNetworkImageProvider("${widget.user.photoUrl}"),
+      //     ),
+      //   ),
+      //   title: Text(widget.user.displayName),
+      //   actions: <Widget>[
+      //     IconButton(
+      //       icon: Icon(Icons.more_vert),
+      //       onPressed: () {
+      //         _signOut();
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: StreamBuilder(
         stream: screens.screenStream,
         initialData: Dashboard(
@@ -165,11 +167,5 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _iconIndex = index;
     });
-  }
-
-  void _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    await GoogleSignIn().signOut();
-    print("Logged out");
   }
 }
