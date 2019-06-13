@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({@required this.user});
@@ -257,7 +258,14 @@ class _DashboardState extends State<Dashboard> {
                       child: Text("OK"),
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await colRef.document('$epochTime').delete();
+                        await colRef.document('$epochTime').delete().then((_) {
+                          Fluttertoast.showToast(
+                            msg: "Record Succesfully Deleted",
+                            backgroundColor: Colors.white,
+                            gravity: ToastGravity.BOTTOM,
+                            textColor: Colors.black,
+                          );
+                        });
                       },
                     ),
                     FlatButton(
