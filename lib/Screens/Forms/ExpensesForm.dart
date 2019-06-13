@@ -5,6 +5,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
+import 'dart:ui';
 
 class ExpensesForm extends StatefulWidget {
   ExpensesForm({
@@ -68,122 +69,131 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueAccent.withOpacity(0.7),
       appBar: AppBar(
         title: Text("Expenses"),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: <Widget>[
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 80, maxWidth: 200),
+      body: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 4.0,
+          sigmaY: 4.0,
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: <Widget>[
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(maxHeight: 80, maxWidth: 200),
+                        child: TextFormField(
+                          controller: amountController,
+                          keyboardType: TextInputType.number,
+                          autofocus: true,
+                          enableInteractiveSelection: false,
+                          textInputAction: TextInputAction.next,
+                          focusNode: amountFocus,
+                          onEditingComplete: () {
+                            FocusScope.of(context).requestFocus(contextFocus);
+                          },
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return "Amount cannot be empty!";
+                            }
+                            if (double.parse(value) > 100000) {
+                              return "Amount is too large!";
+                            }
+                            int decimalCount = 0, i = 0;
+                            while (i < value.length) {
+                              if (value[i] == '.') {
+                                decimalCount++;
+                                if (decimalCount > 1) {
+                                  return "Invalid Amount format!";
+                                }
+                              }
+                              i++;
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.close),
+                                onPressed: () {
+                                  amountController.clear();
+                                },
+                              ),
+                              icon: Icon(Icons.attach_money),
+                              labelText: "Amount"),
+                          inputFormatters: [
+                            WhitelistingTextInputFormatter(RegExp("[0-9\.]")),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20, bottom: 5),
                       child: TextFormField(
-                        controller: amountController,
-                        keyboardType: TextInputType.number,
-                        autofocus: true,
-                        enableInteractiveSelection: false,
+                        controller: contextController,
+                        keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        focusNode: amountFocus,
-                        onEditingComplete: () {
-                          FocusScope.of(context).requestFocus(contextFocus);
-                        },
+                        maxLength: 120,
+                        textCapitalization: TextCapitalization.sentences,
+                        autocorrect: true,
+                        maxLines: null,
+                        focusNode: contextFocus,
                         validator: (value) {
                           if (value.isEmpty) {
-                            return "Amount cannot be empty!";
-                          }
-                          if (double.parse(value) > 100000) {
-                            return "Amount is too large!";
-                          }
-                          int decimalCount = 0, i = 0;
-                          while (i < value.length) {
-                            if (value[i] == '.') {
-                              decimalCount++;
-                              if (decimalCount > 1) {
-                                return "Invalid Amount format!";
-                              }
-                            }
-                            i++;
+                            return "Context cannot be empty!";
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.close),
-                              onPressed: () {
-                                amountController.clear();
-                              },
-                            ),
-                            icon: Icon(Icons.attach_money),
-                            labelText: "Amount"),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              amountController.clear();
+                            },
+                          ),
+                          icon: Icon(Icons.event_note),
+                          labelText: "Context",
+                        ),
                         inputFormatters: [
-                          WhitelistingTextInputFormatter(RegExp("[0-9\.]")),
+                          WhitelistingTextInputFormatter(
+                            RegExp(
+                                "[a-zA-Z0-9\$\.\(\)\@\#\%\&\-\+\,\_\=\;\"\ ]"),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 20, bottom: 5),
-                    child: TextFormField(
-                      controller: contextController,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      maxLength: 120,
-                      textCapitalization: TextCapitalization.sentences,
-                      autocorrect: true,
-                      maxLines: null,
-                      focusNode: contextFocus,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Context cannot be empty!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () {
-                            amountController.clear();
-                          },
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: DateTimePickerFormField(
+                        initialDate: DateTime.now(),
+                        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                        maxLines: null,
+                        controller: dateController,
+                        inputType: InputType.both,
+                        format: formats[InputType.both],
+                        editable: false,
+                        decoration: InputDecoration(
+                          helperText: "(Optional)",
+                          icon: Icon(Icons.today),
+                          labelText: 'Date/Time',
+                          hasFloatingPlaceholder: true,
                         ),
-                        icon: Icon(Icons.event_note),
-                        labelText: "Context",
-                      ),
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter(
-                          RegExp("[a-zA-Z0-9\$\.\(\)\@\#\%\&\-\+\,\_\=\;\"\ ]"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: DateTimePickerFormField(
-                      initialDate: DateTime.now(),
-                      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-                      maxLines: null,
-                      controller: dateController,
-                      inputType: InputType.both,
-                      format: formats[InputType.both],
-                      editable: false,
-                      decoration: InputDecoration(
-                        helperText: "(Optional)",
-                        icon: Icon(Icons.today),
-                        labelText: 'Date/Time',
-                        hasFloatingPlaceholder: true,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

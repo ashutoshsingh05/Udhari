@@ -117,8 +117,9 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
+                PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
                     return ExpensesForm(user: widget.user);
                   },
                 ),
