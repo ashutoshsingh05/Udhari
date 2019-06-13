@@ -122,14 +122,21 @@ class _ExpensesFormState extends State<ExpensesForm> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.close),
-                                onPressed: () {
-                                  amountController.clear();
-                                },
-                              ),
-                              icon: Icon(Icons.attach_money),
-                              labelText: "Amount"),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              // borderRadius: BorderRadius.circular(50),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.backspace),
+                              onPressed: () {
+                                amountController.clear();
+                              },
+                            ),
+                            icon: Icon(Icons.attach_money),
+                            labelText: "Amount",
+                          ),
                           inputFormatters: [
                             WhitelistingTextInputFormatter(RegExp("[0-9\.]")),
                           ],
@@ -155,7 +162,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
                         },
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.close),
+                            icon: Icon(Icons.backspace),
                             onPressed: () {
                               amountController.clear();
                             },
@@ -215,6 +222,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
         amount: double.parse(amountController.text),
         context: contextController.text,
         personName: "Me",
+        epochTime: DateTime.now().millisecondsSinceEpoch.toString(),
       );
 
       await Firestore.instance

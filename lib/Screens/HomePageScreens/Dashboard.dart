@@ -16,9 +16,15 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  CollectionReference colRef;
+
   @override
   void initState() {
     super.initState();
+    colRef = Firestore.instance
+        .collection('Users 2.0')
+        .document('${widget.user.uid}')
+        .collection('Expenses');
   }
 
   @override
@@ -182,10 +188,7 @@ class _DashboardState extends State<Dashboard> {
           Expanded(
             child: SingleChildScrollView(
               child: StreamBuilder(
-                stream: Firestore.instance
-                    .collection('Users 2.0')
-                    .document('${widget.user.uid}')
-                    .collection('Expenses')
+                stream: colRef
                     // .orderBy("", descending: true)
                     .snapshots(),
                 builder: (BuildContext context,
@@ -213,9 +216,11 @@ class _DashboardState extends State<Dashboard> {
                           children: snapshot.data.documents.map(
                             (DocumentSnapshot document) {
                               return _cardBuilder(
-                                  document['amount'],
-                                  "${document['context']}",
-                                  "${document['dateTime']}");
+                                document['amount'],
+                                "${document['context']}",
+                                "${document['dateTime']}",
+                                "${document['epochTime']}",
+                              );
                             },
                           ).toList(),
                         ),
@@ -231,12 +236,39 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _cardBuilder(double amount, String expenseContext, String dateTime) {
+  Widget _cardBuilder(
+      double amount, String expenseContext, String dateTime, String epochTime) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: GestureDetector(
         onTap: () {
           _editCard(amount, expenseContext, dateTime);
+        },
+        onLongPress: () {
+          return showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Confirm Deletion"),
+                  content: Text("Are you sure you wish to delete this record?"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await colRef.document('$epochTime').delete();
+                      },
+                    ),
+                    FlatButton(
+                      child: Text("Cancel"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              });
         },
         child: Card(
           elevation: 5,
