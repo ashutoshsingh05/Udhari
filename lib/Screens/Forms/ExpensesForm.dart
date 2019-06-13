@@ -214,6 +214,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
     if (_formKey.currentState.validate() == true) {
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
+      String _time = DateTime.now().millisecondsSinceEpoch.toString();
 
       Expenses expenses = Expenses(
         dateTime: dateController.text == ""
@@ -222,14 +223,14 @@ class _ExpensesFormState extends State<ExpensesForm> {
         amount: double.parse(amountController.text),
         context: contextController.text,
         personName: "Me",
-        epochTime: DateTime.now().millisecondsSinceEpoch.toString(),
+        epochTime: _time,
       );
 
       await Firestore.instance
           .collection('Users 2.0')
           .document("${widget.user.uid}")
           .collection('Expenses')
-          .document('${DateTime.now().millisecondsSinceEpoch.toString()}')
+          .document(_time)
           .setData(expenses.toJson())
           .then((_) {
         print("Data Successfully saved to cloud!");
