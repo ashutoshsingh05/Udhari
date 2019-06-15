@@ -8,6 +8,7 @@ import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:udhari_2/Utils/TotalExpensesHandler.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({@required this.user});
@@ -21,12 +22,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ScreenHandler screens;
 
+  TotalExpense totalExpense;
+
   int _iconIndex = 0;
 
   @override
   void initState() {
     super.initState();
     screens = ScreenHandler(Dashboard(user: widget.user), widget.user);
+    totalExpense = TotalExpense(
+      user: widget.user,
+    );
   }
 
   @override
@@ -120,7 +126,10 @@ class _HomePageState extends State<HomePage> {
                 PageRouteBuilder(
                   opaque: false,
                   pageBuilder: (BuildContext context, _, __) {
-                    return ExpensesForm(user: widget.user);
+                    return ExpensesForm(
+                      user: widget.user,
+                      streamInstance: totalExpense,
+                    );
                   },
                 ),
               );

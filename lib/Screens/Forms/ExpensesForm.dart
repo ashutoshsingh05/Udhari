@@ -5,16 +5,20 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
+import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
+import 'package:udhari_2/Utils/TotalExpensesHandler.dart';
 import 'dart:ui';
 
 class ExpensesForm extends StatefulWidget {
   ExpensesForm({
     @required this.user,
+    @required this.streamInstance,
     this.amountOpt,
     this.contextOpt,
     this.dateTimeOpt,
   });
 
+  final streamInstance;
   final FirebaseUser user;
   final double amountOpt;
   final String contextOpt;
@@ -26,6 +30,7 @@ class ExpensesForm extends StatefulWidget {
 
 class _ExpensesFormState extends State<ExpensesForm> {
   OverlayEntry _overlayEntry;
+  TotalExpense totalExpense;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -49,6 +54,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
     contextController.text = widget.contextOpt;
     amountController.text =
         (widget.amountOpt) == null ? "" : widget.amountOpt.toString();
+    totalExpense = TotalExpense(user: widget.user);
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         return Container(
@@ -63,6 +69,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
   @override
   void dispose() {
+    // totalExpense.dispose();
     super.dispose();
   }
 
@@ -234,6 +241,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
           .setData(expenses.toJson())
           .then((_) {
         print("Data Successfully saved to cloud!");
+        // totalExpense.updateExpenses();
+        widget.streamInstance.updateExpenses();
         _formKey.currentState.reset();
         _overlayEntry.remove();
         Navigator.pop(context);
