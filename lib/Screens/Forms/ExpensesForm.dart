@@ -6,19 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
-import 'package:udhari_2/Utils/TotalExpensesHandler.dart';
 import 'dart:ui';
 
 class ExpensesForm extends StatefulWidget {
   ExpensesForm({
     @required this.user,
-    @required this.streamInstance,
     this.amountOpt,
     this.contextOpt,
     this.dateTimeOpt,
   });
 
-  final streamInstance;
   final FirebaseUser user;
   final double amountOpt;
   final String contextOpt;
@@ -30,7 +27,6 @@ class ExpensesForm extends StatefulWidget {
 
 class _ExpensesFormState extends State<ExpensesForm> {
   OverlayEntry _overlayEntry;
-  TotalExpense totalExpense;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -54,7 +50,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
     contextController.text = widget.contextOpt;
     amountController.text =
         (widget.amountOpt) == null ? "" : widget.amountOpt.toString();
-    totalExpense = TotalExpense(user: widget.user);
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         return Container(
@@ -69,21 +64,20 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
   @override
   void dispose() {
-    // totalExpense.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent.withOpacity(0.7),
+      backgroundColor: Colors.blueAccent.withOpacity(0.6),
       appBar: AppBar(
         title: Text("Expenses"),
       ),
       body: BackdropFilter(
         filter: ImageFilter.blur(
-          sigmaX: 4.0,
-          sigmaY: 4.0,
+          sigmaX: 3.0,
+          sigmaY: 3.0,
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20),
@@ -132,7 +126,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
-                              // borderRadius: BorderRadius.circular(50),
                               borderSide: BorderSide.none,
                             ),
                             suffixIcon: IconButton(
@@ -241,8 +234,6 @@ class _ExpensesFormState extends State<ExpensesForm> {
           .setData(expenses.toJson())
           .then((_) {
         print("Data Successfully saved to cloud!");
-        // totalExpense.updateExpenses();
-        widget.streamInstance.updateExpenses();
         _formKey.currentState.reset();
         _overlayEntry.remove();
         Navigator.pop(context);

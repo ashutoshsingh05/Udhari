@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
-import 'package:udhari_2/Utils/TotalExpensesHandler.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({@required this.user});
@@ -18,7 +17,17 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   CollectionReference colRef;
-  TotalExpense totalExpense;
+  double total = 0;
+
+  TextStyle _textStyleHeader = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 18,
+  );
+
+  TextStyle _textStyleFooter = TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 24,
+  );
 
   @override
   void initState() {
@@ -27,13 +36,14 @@ class _DashboardState extends State<Dashboard> {
         .collection('Users 2.0')
         .document('${widget.user.uid}')
         .collection('Expenses');
-    totalExpense = TotalExpense(user: widget.user);
-    totalExpense.updateExpenses();
+    expenseHandler();
+    debitHandler();
+    creditHandler();
+    activeTripHandler();
   }
 
   @override
   void dispose() {
-    // totalExpense.dispose();
     super.dispose();
   }
 
@@ -67,6 +77,14 @@ class _DashboardState extends State<Dashboard> {
             title: Text(widget.user.displayName),
             actions: <Widget>[
               IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () {
+                  setState(() {
+                    expenseHandler();
+                  });
+                },
+              ),
+              IconButton(
                 icon: Icon(Icons.more_vert),
                 onPressed: () {
                   _signOut();
@@ -89,20 +107,14 @@ class _DashboardState extends State<Dashboard> {
                       children: <Widget>[
                         Text(
                           "Total Debit",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                          ),
+                          style: _textStyleHeader,
                         ),
                         SizedBox(
                           height: 3,
                         ),
                         Text(
                           "₹0",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: _textStyleFooter,
                         ),
                       ],
                     ),
@@ -115,65 +127,31 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          "Total Credit",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                          ),
-                        ),
+                        Text("Total Credit", style: _textStyleHeader),
                         SizedBox(
                           height: 3,
                         ),
-                        Text(
-                          "₹0",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        Text("₹0", style: _textStyleFooter),
                       ],
                     ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(10, 5, 5, 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      // totalExpense.totalExpenses();
-                    },
-                    child: Card(
-                      elevation: 5,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            "Total Expenses",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 3,
-                          ),
-                          StreamBuilder(
-                            initialData: Text("0"),
-                            stream: totalExpense.expenseStream,
-                            builder: (BuildContext context, snapshot) {
-                              print("snapshot data:${snapshot.data}");
-                              return snapshot.data;
-                            },
-                          ),
-                          // Text(
-                          //   "₹0",
-                          //   style: TextStyle(
-                          //     fontSize: 24,
-                          //     fontWeight: FontWeight.w600,
-                          //   ),
-                          // ),
-                        ],
-                      ),
+                  child: Card(
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text("Total Expenses", style: _textStyleHeader),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "₹$total",
+                          style: _textStyleFooter,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -281,12 +259,6 @@ class _DashboardState extends State<Dashboard> {
                         Navigator.of(context).pop();
                         await colRef.document('$epochTime').delete().then((_) {
                           print("Document Deleted Successfully");
-                          // Fluttertoast.showToast(
-                          //   msg: "Record Succesfully Deleted",
-                          //   backgroundColor: Colors.white,
-                          //   gravity: ToastGravity.BOTTOM,
-                          //   textColor: Colors.black,
-                          // );
                         });
                       },
                     ),
@@ -347,6 +319,35 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  void expenseHandler() async {
+    total = 0;
+    String _time =
+        (DateTime.now().millisecondsSinceEpoch - 2592000000).toString();
+    QuerySnapshot db = await Firestore.instance
+        .collection('Users 2.0')
+        .document(widget.user.uid)
+        .collection('Expenses')
+        .where('epochTime', isGreaterThanOrEqualTo: _time)
+        .getDocuments();
+
+    int length = db.documents.length.toInt();
+
+    setState(() {
+      if (length > 0) {
+        for (int i = 0; i < length; i++) {
+          total += db.documents[i].data['amount'];
+        }
+        print("total Expense: $total");
+      } else {
+        print("total Expense: $total");
+      }
+    });
+  }
+
+  debitHandler() {}
+  creditHandler() {}
+  activeTripHandler() {}
+
   void _signOut() async {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
@@ -356,10 +357,10 @@ class _DashboardState extends State<Dashboard> {
   void _editCard(double amount, String expenseContext, String datetime) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (BuildContext context) {
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
           return ExpensesForm(
-            streamInstance: totalExpense,
             user: widget.user,
             amountOpt: amount,
             contextOpt: expenseContext,
