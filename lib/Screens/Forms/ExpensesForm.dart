@@ -5,7 +5,6 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
-import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
 import 'dart:ui';
 
 class ExpensesForm extends StatefulWidget {
@@ -72,6 +71,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
     return Scaffold(
       backgroundColor: Colors.blueAccent.withOpacity(0.6),
       appBar: AppBar(
+        backgroundColor: Colors.deepPurple.withOpacity(0.5),
         title: Text("Expenses"),
       ),
       body: BackdropFilter(
@@ -94,6 +94,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
                         constraints:
                             BoxConstraints(maxHeight: 80, maxWidth: 200),
                         child: TextFormField(
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                           controller: amountController,
                           keyboardType: TextInputType.number,
                           autofocus: true,
@@ -123,8 +126,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
                             return null;
                           },
                           decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
+                            // filled: true,
+                            // fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),

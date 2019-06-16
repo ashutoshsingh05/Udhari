@@ -105,17 +105,11 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          "Total Debit",
-                          style: _textStyleHeader,
-                        ),
+                        Text("Total Debit", style: _textStyleHeader),
                         SizedBox(
                           height: 3,
                         ),
-                        Text(
-                          "₹0",
-                          style: _textStyleFooter,
-                        ),
+                        Text("₹0", style: _textStyleFooter),
                       ],
                     ),
                   ),
@@ -143,7 +137,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text("Total Expenses", style: _textStyleHeader),
+                        Text("Expenses (30d)", style: _textStyleHeader),
                         SizedBox(
                           height: 3,
                         ),
@@ -162,23 +156,11 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          "Active Trips",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                          ),
-                        ),
+                        Text("Active Trips", style: _textStyleHeader),
                         SizedBox(
                           height: 3,
                         ),
-                        Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        Text("0", style: _textStyleFooter),
                       ],
                     ),
                   ),
@@ -189,8 +171,15 @@ class _DashboardState extends State<Dashboard> {
           Expanded(
             child: SingleChildScrollView(
               child: StreamBuilder(
-                stream:
-                    colRef.orderBy("epochTime", descending: true).snapshots(),
+                // where query to fetch expenses records only of the past month
+                // 2592000000 are the exact number of milliseconds in 30 days
+                stream: colRef
+                    .orderBy("epochTime", descending: true)
+                    .where('epochTime',
+                        isGreaterThanOrEqualTo:
+                            (DateTime.now().millisecondsSinceEpoch - 2592000000)
+                                .toString())
+                    .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting ||
