@@ -6,6 +6,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 class UdhariForm extends StatefulWidget {
   UdhariForm({@required this.user});
@@ -20,7 +21,8 @@ class _UdhariFormState extends State<UdhariForm> {
   Expenses expenses;
   Udhari udhari;
 
-  var dropDownButtonValue;
+  var udhariTypeValue;
+  var personNamevalue;
 
   OverlayEntry _overlayEntry;
 
@@ -29,12 +31,14 @@ class _UdhariFormState extends State<UdhariForm> {
   TextEditingController dateController = TextEditingController();
   TextEditingController contextController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController personNameController = TextEditingController();
+  // TextEditingController personNameController = TextEditingController();
 
   // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
-  FocusNode personNameFocus = FocusNode();
+  // FocusNode personNameFocus = FocusNode();
+
+  List<DropdownMenuItem> myContacts;
 
   final formats = {
     InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
@@ -55,6 +59,7 @@ class _UdhariFormState extends State<UdhariForm> {
         );
       },
     );
+    initializeContactsList();
   }
 
   @override
@@ -85,10 +90,10 @@ class _UdhariFormState extends State<UdhariForm> {
                         maxWidth: 160,
                       ),
                       child: DropdownButtonFormField(
-                        value: dropDownButtonValue,
+                        value: udhariTypeValue,
                         onChanged: (newValue) {
                           setState(() {
-                            dropDownButtonValue = newValue;
+                            udhariTypeValue = newValue;
                             print("Changed to new Value: $newValue");
                           });
                         },
@@ -116,18 +121,26 @@ class _UdhariFormState extends State<UdhariForm> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
-                    child: TextFormField(
-                      controller: personNameController,
-                      keyboardType: TextInputType.text,
-                      maxLength: 30,
-                      textCapitalization: TextCapitalization.words,
-                      textInputAction: TextInputAction.next,
-                      autocorrect: true,
-                      maxLines: 1,
-                      focusNode: personNameFocus,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(amountFocus);
+                    child: DropdownButtonFormField(
+                      value: personNamevalue,
+                      items: myContacts,
+                      onChanged: (newPerson) {
+                        setState(() {
+                          personNamevalue = newPerson;
+                        });
                       },
+                      // controller: personNameController,
+                      // keyboardType: TextInputType.text,
+                      // maxLength: 30,
+                      // textCapitalization: TextCapitalization.words,
+                      // textInputAction: TextInputAction.next,
+                      // autocorrect: true,
+                      // maxLines: 1,
+                      // focusNode: personNameFocus,
+                      // onEditingComplete: () {
+                      //   FocusScope.of(context).requestFocus(amountFocus);
+                      // },
+                      hint: Text("Select Name"),
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Name cannot be empty!";
@@ -138,17 +151,17 @@ class _UdhariFormState extends State<UdhariForm> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.backspace),
                           onPressed: () {
-                            personNameController.clear();
+                            // personNameController.clear();
                           },
                         ),
                         icon: Icon(Icons.account_circle),
                         labelText: "Name",
                       ),
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter(
-                          RegExp("[a-zA-Z\.\(\)\&\-\+\,\ ]"),
-                        ),
-                      ],
+                      // inputFormatters: [
+                      //   WhitelistingTextInputFormatter(
+                      //     RegExp("[a-zA-Z\.\(\)\&\-\+\,\ ]"),
+                      //   ),
+                      // ],
                     ),
                   ),
                   Padding(
@@ -273,6 +286,11 @@ class _UdhariFormState extends State<UdhariForm> {
     );
   }
 
+  initializeContactsList() async {
+    Iterable<Contact> contacts = await ContactsService.getContacts();
+    print(contacts);
+  }
+
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
       String _time = DateTime.now().millisecondsSinceEpoch.toString();
@@ -287,13 +305,13 @@ class _UdhariFormState extends State<UdhariForm> {
             : dateController.text,
         amount: double.parse(amountController.text),
         context: contextController.text,
-        personName: personNameController.text,
+        // personName: personNameController.text,
         epochTime: _time,
       );
 
       udhari = Udhari(
         udhari: expenses,
-        isBorrowed: dropDownButtonValue == "Borrowed" ? true : false,
+        isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
         isPaid: false,
       );
 
