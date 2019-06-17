@@ -7,16 +7,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
-class NormalUdhariForm extends StatefulWidget {
-  NormalUdhariForm({@required this.user});
+class UdhariForm extends StatefulWidget {
+  UdhariForm({@required this.user});
 
   final FirebaseUser user;
 
   @override
-  _NormalUdhariFormState createState() => _NormalUdhariFormState();
+  _UdhariFormState createState() => _UdhariFormState();
 }
 
-class _NormalUdhariFormState extends State<NormalUdhariForm> {
+class _UdhariFormState extends State<UdhariForm> {
   Expenses expenses;
   Udhari udhari;
 
@@ -275,6 +275,7 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
 
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
+      String _time = DateTime.now().millisecondsSinceEpoch.toString();
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
 
@@ -287,18 +288,20 @@ class _NormalUdhariFormState extends State<NormalUdhariForm> {
         amount: double.parse(amountController.text),
         context: contextController.text,
         personName: personNameController.text,
+        epochTime: _time,
       );
 
       udhari = Udhari(
         udhari: expenses,
         isBorrowed: dropDownButtonValue == "Borrowed" ? true : false,
+        isPaid: false,
       );
 
       await Firestore.instance
           .collection('Users 2.0')
           .document("${widget.user.uid}")
           .collection('Udhari')
-          .document('${DateTime.now().millisecondsSinceEpoch.toString()}')
+          .document(_time)
           .setData(udhari.toJson())
           .then((_) {
         print("Data Successfully saved to cloud!");

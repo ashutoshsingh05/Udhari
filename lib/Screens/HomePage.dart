@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
-import 'package:udhari_2/Screens/Forms/NormalUdhariForm.dart';
+import 'package:udhari_2/Screens/Forms/UdhariForm.dart';
 import 'package:udhari_2/Screens/Forms/TripsForm.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
@@ -139,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) {
-                    return NormalUdhariForm(user: widget.user);
+                    return UdhariForm(user: widget.user);
                   },
                 ),
               );

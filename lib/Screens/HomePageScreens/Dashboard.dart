@@ -78,13 +78,15 @@ class _DashboardState extends State<Dashboard> {
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.refresh),
+                tooltip: 'Recalculate',
                 onPressed: () {
-                  setState(() {
-                    expenseHandler();
-                  });
+                  // setState(() {
+                  expenseHandler();
+                  // });
                 },
               ),
               IconButton(
+                tooltip: 'Options',
                 icon: Icon(Icons.more_vert),
                 onPressed: () {
                   _signOut();
@@ -206,9 +208,9 @@ class _DashboardState extends State<Dashboard> {
                             (DocumentSnapshot document) {
                               return _cardBuilder(
                                 document['amount'],
-                                "${document['context']}",
-                                "${document['dateTime']}",
-                                "${document['epochTime']}",
+                                document['context'],
+                                document['dateTime'],
+                                document['epochTime'],
                               );
                             },
                           ).toList(),
