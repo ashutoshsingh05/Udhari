@@ -2,16 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class Trips extends StatefulWidget {
-  Trips({@required this.user});
+class Udhari extends StatefulWidget {
+  Udhari({@required this.user});
 
   final FirebaseUser user;
 
   @override
-  _TripsState createState() => _TripsState();
+  _UdhariState createState() => _UdhariState();
 }
 
-class _TripsState extends State<Trips> {
+class _UdhariState extends State<Udhari> {
   @override
   Widget build(BuildContext context) {
     return Container(

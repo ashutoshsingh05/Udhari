@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
 import 'package:udhari_2/Screens/HomePageScreens/History.dart';
-import 'package:udhari_2/Screens/HomePageScreens/NormalUdhari.dart';
+import 'package:udhari_2/Screens/HomePageScreens/Udhari.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Trips.dart';
 
 class ScreenHandler {
@@ -29,7 +29,7 @@ class ScreenHandler {
         changeScreen(Dashboard(user: this.user));
         break;
       case 1:
-        changeScreen(NormalUdhari(user: this.user));
+        changeScreen(Udhari(user: this.user));
         break;
       case 2:
         changeScreen(Trips(user: this.user));

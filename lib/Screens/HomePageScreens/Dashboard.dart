@@ -320,17 +320,17 @@ class _DashboardState extends State<Dashboard> {
         .getDocuments();
 
     int length = db.documents.length.toInt();
-
-    setState(() {
-      if (length > 0) {
-        for (int i = 0; i < length; i++) {
-          total += db.documents[i].data['amount'];
+    if (this.mounted)
+      setState(() {
+        if (length > 0) {
+          for (int i = 0; i < length; i++) {
+            total += db.documents[i].data['amount'];
+          }
+          print("total Expense: $total");
+        } else {
+          print("total Expense: $total");
         }
-        print("total Expense: $total");
-      } else {
-        print("total Expense: $total");
-      }
-    });
+      });
   }
 
   debitHandler() {}
