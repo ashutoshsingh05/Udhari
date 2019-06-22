@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class UdhariForm extends StatefulWidget {
   UdhariForm({@required this.user});
@@ -42,9 +43,71 @@ class _UdhariFormState extends State<UdhariForm> {
 
   final formats = {
     InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
-    InputType.date: DateFormat('yyyy-MM-dd'),
-    InputType.time: DateFormat("HH:mm"),
+    // InputType.date: DateFormat('yyyy-MM-dd'),
+    // InputType.time: DateFormat("HH:mm"),
   };
+
+  // getPermission() async {
+  //   PermissionStatus permission;
+  //   permission = await PermissionHandler()
+  //       .checkPermissionStatus(PermissionGroup.contacts)
+  //       .then((onValue) {
+  //     print("Permission Status: $permission");
+  //   });
+
+  //   Map<PermissionGroup, PermissionStatus> permissions =
+  //       await PermissionHandler()
+  //           .requestPermissions([PermissionGroup.contacts]);
+  //   // await PermissionHandler()
+  //   //     .shouldShowRequestPermissionRationale(PermissionGroup.contacts);
+  //   permission = await PermissionHandler()
+  //       .checkPermissionStatus(PermissionGroup.contacts)
+  //       .then((onValue) {
+  //     print("Permission Status: $permission");
+  //   });
+  // }
+
+  _permissionhandler() async {
+    PermissionStatus permission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.contacts);
+    print("Permission Check: $permission");
+    if (permission != PermissionStatus.granted) {
+      Map<PermissionGroup, PermissionStatus> permissionReq =
+          await PermissionHandler()
+              .requestPermissions([PermissionGroup.contacts]);
+      print("Permission Req: $permissionReq");
+      if (permissionReq.values.elementAt(0) == PermissionStatus.denied) {
+        await PermissionHandler().openAppSettings();
+        if (permission != PermissionStatus.granted) {
+          return showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Contacts Permission"),
+                  content: Text(
+                      "Please give Contacts permission. It is necessary for providing person name suggestion"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _permissionhandler();
+                      },
+                    ),
+                  ],
+                );
+              });
+        } else {
+          print("Initializing contacts");
+          initializeContactsList();
+        }
+      }
+    } else if (permission == PermissionStatus.granted) {
+      print("Initializing contacts");
+      initializeContactsList();
+    }
+  }
 
   @override
   void initState() {
@@ -59,7 +122,8 @@ class _UdhariFormState extends State<UdhariForm> {
         );
       },
     );
-    initializeContactsList();
+    _permissionhandler();
+    // initializeContactsList();
   }
 
   @override
@@ -142,7 +206,7 @@ class _UdhariFormState extends State<UdhariForm> {
                       // },
                       hint: Text("Select Name"),
                       validator: (value) {
-                        if (value.isEmpty) {
+                        if (value == null) {
                           return "Name cannot be empty!";
                         }
                         return null;

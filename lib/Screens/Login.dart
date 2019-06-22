@@ -35,7 +35,7 @@ class _LoginState extends State<Login> {
     scopes: [
       'email',
       'https://www.googleapis.com/auth/user.phonenumbers.read',
-      'https://www.googleapis.com/auth/contacts.readonly',
+      // 'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
   final FirebaseAuth _auth = FirebaseAuth.instance;
