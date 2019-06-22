@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/TripClass.dart';
@@ -13,12 +14,12 @@ class User {
   List<History> history;
 
   User({
-    this.phoneNumber,
-    this.uid,
-    this.trips,
-    this.udhari,
-    this.expenses,
-    this.history,
+    @required this.phoneNumber,
+    @required this.uid,
+    @required this.trips,
+    @required this.udhari,
+    @required this.expenses,
+    @required this.history,
   });
 
   User.fromSnapshot(snapshot) {

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class History {
@@ -5,8 +6,8 @@ class History {
   String category;
 
   History({
-    this.category,
-    this.history,
+    @required this.category,
+    @required this.history,
   });
 
   History.fromSnapshot(snapshot) {

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class Trip {
@@ -7,10 +8,10 @@ class Trip {
   bool isActive;
 
   Trip({
-    this.isActive,
-    this.tripCode,
-    this.tripName,
-    this.trips,
+    @required this.isActive,
+    @required this.tripCode,
+    @required this.tripName,
+    @required this.trips,
   });
 
   Trip.fromSnapshot(snapshot) {

@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 class Expenses {
   String dateTime;
   double amount;
@@ -7,12 +9,12 @@ class Expenses {
   String displayPicture;
 
   Expenses(
-      {this.amount,
-      this.context,
-      this.dateTime,
-      this.personName,
-      this.epochTime,
-      this.displayPicture});
+      {@required this.amount,
+      @required this.context,
+      @required this.dateTime,
+      @required this.personName,
+      @required this.epochTime,
+      @required this.displayPicture});
 
   Expenses.fromSnapshot(snapshot) {
     dateTime = snapshot.data['dateTime'];

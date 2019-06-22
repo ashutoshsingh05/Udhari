@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class Udhari {
@@ -6,9 +7,9 @@ class Udhari {
   bool isPaid;
 
   Udhari({
-    this.isBorrowed,
-    this.udhari,
-    this.isPaid,
+    @required this.isBorrowed,
+    @required this.udhari,
+    @required this.isPaid,
   });
 
   Udhari.fromSnapshot(snapshot) {

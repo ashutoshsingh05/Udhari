@@ -47,26 +47,6 @@ class _UdhariFormState extends State<UdhariForm> {
     // InputType.time: DateFormat("HH:mm"),
   };
 
-  // getPermission() async {
-  //   PermissionStatus permission;
-  //   permission = await PermissionHandler()
-  //       .checkPermissionStatus(PermissionGroup.contacts)
-  //       .then((onValue) {
-  //     print("Permission Status: $permission");
-  //   });
-
-  //   Map<PermissionGroup, PermissionStatus> permissions =
-  //       await PermissionHandler()
-  //           .requestPermissions([PermissionGroup.contacts]);
-  //   // await PermissionHandler()
-  //   //     .shouldShowRequestPermissionRationale(PermissionGroup.contacts);
-  //   permission = await PermissionHandler()
-  //       .checkPermissionStatus(PermissionGroup.contacts)
-  //       .then((onValue) {
-  //     print("Permission Status: $permission");
-  //   });
-  // }
-
   _permissionhandler() async {
     PermissionStatus permission = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.contacts);
@@ -84,7 +64,7 @@ class _UdhariFormState extends State<UdhariForm> {
               barrierDismissible: false,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text("Contacts Permission"),
+                  title: Text("Permission Denied"),
                   content: Text(
                       "Please give Contacts permission. It is necessary for providing person name suggestion"),
                   actions: <Widget>[
@@ -123,7 +103,6 @@ class _UdhariFormState extends State<UdhariForm> {
       },
     );
     _permissionhandler();
-    // initializeContactsList();
   }
 
   @override
@@ -193,17 +172,6 @@ class _UdhariFormState extends State<UdhariForm> {
                           personNamevalue = newPerson;
                         });
                       },
-                      // controller: personNameController,
-                      // keyboardType: TextInputType.text,
-                      // maxLength: 30,
-                      // textCapitalization: TextCapitalization.words,
-                      // textInputAction: TextInputAction.next,
-                      // autocorrect: true,
-                      // maxLines: 1,
-                      // focusNode: personNameFocus,
-                      // onEditingComplete: () {
-                      //   FocusScope.of(context).requestFocus(amountFocus);
-                      // },
                       hint: Text("Select Name"),
                       validator: (value) {
                         if (value == null) {
@@ -212,33 +180,21 @@ class _UdhariFormState extends State<UdhariForm> {
                         return null;
                       },
                       decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.backspace),
-                          onPressed: () {
-                            // personNameController.clear();
-                          },
-                        ),
                         icon: Icon(Icons.account_circle),
-                        labelText: "Name",
                       ),
-                      // inputFormatters: [
-                      //   WhitelistingTextInputFormatter(
-                      //     RegExp("[a-zA-Z\.\(\)\&\-\+\,\ ]"),
-                      //   ),
-                      // ],
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 80, maxWidth: 200),
+                      constraints: BoxConstraints(maxHeight: 80, maxWidth: 250),
                       child: TextFormField(
                         controller: amountController,
                         keyboardType: TextInputType.number,
                         enableInteractiveSelection: false,
                         textInputAction: TextInputAction.next,
                         focusNode: amountFocus,
-                        maxLength: 6,
+                        // maxLength: 6,
                         onEditingComplete: () {
                           FocusScope.of(context).requestFocus(contextFocus);
                         },
@@ -247,7 +203,7 @@ class _UdhariFormState extends State<UdhariForm> {
                             return "Amount cannot be empty!";
                           }
                           if (double.parse(value) > 100000) {
-                            return "Amount is too large!";
+                            return "Too large! Pay your taxes!!";
                           }
                           int decimalCount = 0, i = 0;
                           while (i < value.length) {
@@ -362,6 +318,8 @@ class _UdhariFormState extends State<UdhariForm> {
       _formKey.currentState.save();
 
       expenses = Expenses(
+        personName: "",
+        displayPicture: "",
         dateTime: dateController.text == ""
             ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")
                 .format(DateTime.now())
