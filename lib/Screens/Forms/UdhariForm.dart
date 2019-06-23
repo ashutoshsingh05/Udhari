@@ -8,6 +8,7 @@ import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class UdhariForm extends StatefulWidget {
   UdhariForm({@required this.user});
@@ -32,7 +33,7 @@ class _UdhariFormState extends State<UdhariForm> {
   TextEditingController dateController = TextEditingController();
   TextEditingController contextController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  // TextEditingController personNameController = TextEditingController();
+  TextEditingController personNameController = TextEditingController();
 
   // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
@@ -41,53 +42,13 @@ class _UdhariFormState extends State<UdhariForm> {
 
   List<DropdownMenuItem> myContacts;
 
+  ContactsProvider _contactsProvider;
+
   final formats = {
     InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
     // InputType.date: DateFormat('yyyy-MM-dd'),
     // InputType.time: DateFormat("HH:mm"),
   };
-
-  _permissionhandler() async {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.contacts);
-    print("Permission Check: $permission");
-    if (permission != PermissionStatus.granted) {
-      Map<PermissionGroup, PermissionStatus> permissionReq =
-          await PermissionHandler()
-              .requestPermissions([PermissionGroup.contacts]);
-      print("Permission Req: $permissionReq");
-      if (permissionReq.values.elementAt(0) == PermissionStatus.denied) {
-        await PermissionHandler().openAppSettings();
-        if (permission != PermissionStatus.granted) {
-          return showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Permission Denied"),
-                  content: Text(
-                      "Please give Contacts permission. It is necessary for providing person name suggestion"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _permissionhandler();
-                      },
-                    ),
-                  ],
-                );
-              });
-        } else {
-          print("Initializing contacts");
-          initializeContactsList();
-        }
-      }
-    } else if (permission == PermissionStatus.granted) {
-      print("Initializing contacts");
-      initializeContactsList();
-    }
-  }
 
   @override
   void initState() {
@@ -164,24 +125,58 @@ class _UdhariFormState extends State<UdhariForm> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
-                    child: DropdownButtonFormField(
-                      value: personNamevalue,
-                      items: myContacts,
-                      onChanged: (newPerson) {
-                        setState(() {
-                          personNamevalue = newPerson;
-                        });
-                      },
-                      hint: Text("Select Name"),
-                      validator: (value) {
-                        if (value == null) {
-                          return "Name cannot be empty!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.account_circle),
+                    // child: DropdownButtonFormField(
+                    //   value: personNamevalue,
+                    //   items: myContacts,
+                    //   onChanged: (newPerson) {
+                    //     setState(() {
+                    //       personNamevalue = newPerson;
+                    //     });
+                    //   },
+                    //   hint: Text("Select Name"),
+                    //   validator: (value) {
+                    //     if (value == null) {
+                    //       return "Name cannot be empty!";
+                    //     }
+                    //     return null;
+                    //   },
+                    //   decoration: InputDecoration(
+                    //     icon: Icon(Icons.account_circle),
+                    //   ),
+                    // ),
+                    child: TypeAheadFormField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: personNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Person Name',
+                          icon: Icon(
+                            Icons.account_circle,
+                          ),
+                        ),
                       ),
+                      suggestionsCallback: (pattern) {
+                        // print("Pattern: $pattern");
+                        return _contactsProvider.getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        // print("Suggestion: $suggestion");
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      transitionBuilder: (context, suggestionsBox, controller) {
+                        return suggestionsBox;
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        personNameController.text = suggestion;
+                        print("Selected: $suggestion");
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter a name';
+                        }
+                      },
+                      // onSaved: (value) => this._selectedCity = value,
                     ),
                   ),
                   Padding(
@@ -306,10 +301,96 @@ class _UdhariFormState extends State<UdhariForm> {
     );
   }
 
-  initializeContactsList() async {
-    Iterable<Contact> contacts = await ContactsService.getContacts();
-    print(contacts);
+  void _permissionhandler() async {
+    PermissionStatus permission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.contacts);
+    print("Permission Check: $permission");
+    if (permission != PermissionStatus.granted) {
+      Map<PermissionGroup, PermissionStatus> permissionReq =
+          await PermissionHandler()
+              .requestPermissions([PermissionGroup.contacts]);
+      print("Permission Req: $permissionReq");
+      if (permissionReq.values.elementAt(0) == PermissionStatus.denied) {
+        await PermissionHandler().openAppSettings();
+        if (permission != PermissionStatus.granted) {
+          return showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Permission Denied"),
+                  content: Text(
+                      "Please give Contacts permission. It is necessary for providing person name suggestion"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _permissionhandler();
+                      },
+                    ),
+                  ],
+                );
+              });
+        } else {
+          print("Initializing contacts");
+          _contactsProvider = ContactsProvider();
+          // contactNameListBuilder();
+        }
+      }
+    } else {
+      print("Initializing contacts");
+      _contactsProvider = ContactsProvider();
+      // contactNameListBuilder();
+    }
   }
+
+  // contactNameListBuilder() async {
+  //   myContacts = List<DropdownMenuItem>();
+  //   Iterable<Contact> contacts = await ContactsService.getContacts();
+  //   setState(() {
+  //     for (Contact c in contacts) {
+  //       print("Contact: ${c.displayName}");
+  //       for (Item i in c.phones) {
+  //         String number = i.value;
+  //         if (number.length > 10) {
+  //           number = number
+  //               .replaceAll(" ", "")
+  //               .replaceAll("+", "")
+  //               .replaceAll("-", "")
+  //               .trim();
+  //           number = number.substring(number.length - 10, number.length);
+  //           print("Number: $number");
+  //         }
+  //         myContacts.add(
+  //           DropdownMenuItem(
+  //             // child: RichText(
+  //             //   text: TextSpan(
+  //             //     children: [
+  //             //       TextSpan(
+  //             //         text: c.displayName,
+  //             //         style: TextStyle(fontSize: 14, color: Colors.black),
+  //             //       ),
+  //             //       TextSpan(
+  //             //         text: ", $number",
+  //             //         style: TextStyle(fontSize: 12, color: Colors.grey),
+  //             //       ),
+  //             //     ],
+  //             //   ),
+  //             //   maxLines: 1,
+  //             //   overflow: TextOverflow.ellipsis,
+  //             // ),
+  //             child: ListTile(
+  //               title: Text(c.displayName),
+  //             ),
+  //             value: number,
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   });
+  //   // print("Contacts: $contacts");
+  // }
 
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
@@ -372,5 +453,37 @@ class _UdhariFormState extends State<UdhariForm> {
     } else {
       print("Form data NOT saved");
     }
+  }
+}
+
+class ContactsProvider {
+  List<Contact> phoneContacts = List();
+  Iterable<Contact> contacts;
+
+  ContactsProvider() {
+    assignContacts();
+  }
+
+  assignContacts() async {
+    contacts = await ContactsService.getContacts();
+    for (Contact c in contacts) {
+      phoneContacts.add(c);
+    }
+  }
+
+  List<String> getSuggestions(String query) {
+    List<Contact> matches = List();
+    List<String> matchesNames = List();
+    matches.addAll(phoneContacts);
+
+    matches.retainWhere(
+        (s) => s.displayName.toLowerCase().contains(query.toLowerCase()));
+    matches.forEach((f) {
+      matchesNames.add(f.displayName);
+      // print("matchesNames: $matchesNames");
+      // print("matches: ${f.displayName}");
+    });
+    // print("matchesNames: $matchesNames");
+    return matchesNames;
   }
 }
