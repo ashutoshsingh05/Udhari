@@ -1,119 +1,53 @@
-// import 'package:flutter/material.dart';
-// import 'package:contacts_service/contacts_service.dart';
-// import 'package:permission_handler/permission_handler.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:contacts_service/contacts_service.dart';
 
-// class ContactsProvider {
-//   static final List<String> cities = [
-//     'Beirut',
-//     'Damascus',
-//     'San Fransisco',
-//     'Rome',
-//     'Los Angeles',
-//     'Madrid',
-//     'Bali',
-//     'Barcelona',
-//     'Paris',
-//     'Bucharest',
-//     'New York City',
-//     'Philadelphia',
-//     'Sydney',
-//   ];
+class ContactsProvider {
+  List<Contact> phoneContacts = List<Contact>();
+  Iterable<Contact> contacts;
+  List<String> contactNames = List<String>();
 
-//   static List<String> getSuggestions(String query) {
-//     List<String> matches = List();
-//     matches.addAll(cities);
+  ContactsProvider() {
+    _assignContacts();
+  }
 
-//     matches.retainWhere((s) => s.toLowerCase().contains(query.toLowerCase()));
-//     return matches;
-//   }
+  _assignContacts() async {
+    contacts = await ContactsService.getContacts();
+    for (Contact c in contacts) {
+      phoneContacts.add(c);
+      contactNames.add(c.displayName);
+    }
+  }
 
-//   void _permissionhandler() async {
-//     PermissionStatus permission = await PermissionHandler()
-//         .checkPermissionStatus(PermissionGroup.contacts);
-//     print("Permission Check: $permission");
-//     if (permission != PermissionStatus.granted) {
-//       Map<PermissionGroup, PermissionStatus> permissionReq =
-//           await PermissionHandler()
-//               .requestPermissions([PermissionGroup.contacts]);
-//       print("Permission Req: $permissionReq");
-//       if (permissionReq.values.elementAt(0) == PermissionStatus.denied) {
-//         await PermissionHandler().openAppSettings();
-//         if (permission != PermissionStatus.granted) {
-//           return showDialog(
-//               context: context,
-//               barrierDismissible: false,
-//               builder: (BuildContext context) {
-//                 return AlertDialog(
-//                   title: Text("Permission Denied"),
-//                   content: Text(
-//                       "Please give Contacts permission. It is necessary for providing person name suggestion"),
-//                   actions: <Widget>[
-//                     FlatButton(
-//                       child: Text("OK"),
-//                       onPressed: () {
-//                         Navigator.pop(context);
-//                         _permissionhandler();
-//                       },
-//                     ),
-//                   ],
-//                 );
-//               });
-//         } else {
-//           print("Initializing contacts");
-//           contactNameListBuilder();
-//         }
-//       }
-//     } else if (permission == PermissionStatus.granted) {
-//       print("Initializing contacts");
-//       contactNameListBuilder();
-//     }
-//   }
+  List<String> getSuggestions(String query) {
+    List<Contact> matches = List<Contact>();
+    List<String> matchesNames = List<String>();
+    matches.addAll(phoneContacts);
 
-//   contactNameListBuilder() async {
-//     myContacts = List<DropdownMenuItem>();
-//     Iterable<Contact> contacts = await ContactsService.getContacts();
-//     setState(() {
-//       for (Contact c in contacts) {
-//         print("Contact: ${c.displayName}");
-//         for (Item i in c.phones) {
-//           String number = i.value;
-//           if (number.length > 10) {
-//             number = number
-//                 .replaceAll(" ", "")
-//                 .replaceAll("+", "")
-//                 .replaceAll("-", "")
-//                 .trim();
-//             number = number.substring(number.length - 10, number.length);
-//             print("Number: $number");
-//           }
-//           myContacts.add(
-//             DropdownMenuItem(
-//               // child: RichText(
-//               //   text: TextSpan(
-//               //     children: [
-//               //       TextSpan(
-//               //         text: c.displayName,
-//               //         style: TextStyle(fontSize: 14, color: Colors.black),
-//               //       ),
-//               //       TextSpan(
-//               //         text: ", $number",
-//               //         style: TextStyle(fontSize: 12, color: Colors.grey),
-//               //       ),
-//               //     ],
-//               //   ),
-//               //   maxLines: 1,
-//               //   overflow: TextOverflow.ellipsis,
-//               // ),
-//               child: ListTile(
-//                 title: Text(c.displayName),
-//               ),
-//               value: number,
-//             ),
-//           );
-//         }
-//       }
-//     });
-//     // print("Contacts: $contacts");
-//   }
-// }
+    matches.retainWhere(
+        (s) => s.displayName.toLowerCase().contains(query.toLowerCase()));
+    matches.forEach((f) {
+      matchesNames.add(f.displayName);
+      // print("matchesNames: $matchesNames");
+      // print("matches: ${f.displayName}");
+    });
+    // print("matchesNames: $matchesNames");
+    return matchesNames;
+  }
+
+  List<String> getPhoneNumbers(String contactName) {
+    Set<String> phonesNumbers = Set<String>();
+    List<Contact> matches = List<Contact>();
+    matches.addAll(phoneContacts);
+    matches.retainWhere((s) => s.displayName.contains(contactName));
+    matches.forEach((cntc) {
+      for (Item i in cntc.phones) {
+        String number = i.value;
+        number = number.replaceAll(RegExp('[\ \+\-\.\,\(\)\/\N\*\#\;]'), "");
+        print("length: ${number.length}");
+        if (number.length > 10) number = number.substring(number.length - 10);
+        phonesNumbers.add(number);
+      }
+    });
+    print("PhoneNumbers: $phonesNumbers");
+    return phonesNumbers.toList();
+  }
+}

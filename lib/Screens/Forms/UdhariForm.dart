@@ -6,9 +6,9 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:udhari_2/Models/ContactsProvider.dart';
 
 class UdhariForm extends StatefulWidget {
   UdhariForm({@required this.user});
@@ -35,10 +35,9 @@ class _UdhariFormState extends State<UdhariForm> {
   TextEditingController amountController = TextEditingController();
   TextEditingController personNameController = TextEditingController();
 
-  // FocusNode dateFocus = FocusNode();
   FocusNode amountFocus = FocusNode();
   FocusNode contextFocus = FocusNode();
-  // FocusNode personNameFocus = FocusNode();
+  FocusNode personNameFocus = FocusNode();
 
   List<DropdownMenuItem> myContacts;
 
@@ -146,7 +145,13 @@ class _UdhariFormState extends State<UdhariForm> {
                     // ),
                     child: TypeAheadFormField(
                       textFieldConfiguration: TextFieldConfiguration(
+                        focusNode: personNameFocus,
                         controller: personNameController,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter(
+                            RegExp("[a-zA-Z0-9\ \(\)\-\=\+\&\,\.]"),
+                          ),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Person Name',
                           icon: Icon(
@@ -155,11 +160,9 @@ class _UdhariFormState extends State<UdhariForm> {
                         ),
                       ),
                       suggestionsCallback: (pattern) {
-                        // print("Pattern: $pattern");
                         return _contactsProvider.getSuggestions(pattern);
                       },
                       itemBuilder: (context, suggestion) {
-                        // print("Suggestion: $suggestion");
                         return ListTile(
                           title: Text(suggestion),
                         );
@@ -174,6 +177,9 @@ class _UdhariFormState extends State<UdhariForm> {
                       validator: (value) {
                         if (value.isEmpty) {
                           return 'Please enter a name';
+                        }
+                        if (!_contactsProvider.contactNames.contains(value)) {
+                          return "Select Contact from dropdown Menu";
                         }
                       },
                       // onSaved: (value) => this._selectedCity = value,
@@ -310,26 +316,36 @@ class _UdhariFormState extends State<UdhariForm> {
           await PermissionHandler()
               .requestPermissions([PermissionGroup.contacts]);
       print("Permission Req: $permissionReq");
-      if (permissionReq.values.elementAt(0) == PermissionStatus.denied) {
+      if (permissionReq.values.elementAt(0) != PermissionStatus.granted) {
         await PermissionHandler().openAppSettings();
         if (permission != PermissionStatus.granted) {
           return showDialog(
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Permission Denied"),
-                  content: Text(
-                      "Please give Contacts permission. It is necessary for providing person name suggestion"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _permissionhandler();
-                      },
-                    ),
-                  ],
+                return WillPopScope(
+                  onWillPop: () async => false,
+                  child: AlertDialog(
+                    title: Text("Permission Denied"),
+                    content: Text(
+                        "Please give Contacts permission. It is required for providing person name suggestions"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _permissionhandler();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
                 );
               });
         } else {
@@ -397,9 +413,7 @@ class _UdhariFormState extends State<UdhariForm> {
       String _time = DateTime.now().millisecondsSinceEpoch.toString();
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
-
       expenses = Expenses(
-        personName: "",
         displayPicture: "",
         dateTime: dateController.text == ""
             ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")
@@ -408,7 +422,7 @@ class _UdhariFormState extends State<UdhariForm> {
             : dateController.text,
         amount: double.parse(amountController.text),
         context: contextController.text,
-        // personName: personNameController.text,
+        personName: personNameController.text,
         epochTime: _time,
       );
 
@@ -417,6 +431,29 @@ class _UdhariFormState extends State<UdhariForm> {
         isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
         isPaid: false,
       );
+      print(
+          "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[0]}");
+      // var db = Firestore.instance;
+      // db.runTransaction((transactionHandler) {
+      //   transactionHandler
+      //       .get(db.collection("Users 2.0").document())
+      //       .then((DocumentSnapshot snapshot) {
+      //         print("Phone number: ${snapshot.data["phoneNumber"]}");
+      //       });
+      // });
+      var query = await Firestore.instance
+          .collection("Users 2.0")
+          .where("PhoneNumber",
+              isEqualTo: _contactsProvider
+                  .getPhoneNumbers(personNameController.text)[1])
+          .getDocuments()
+          .then((snapshot) {
+        snapshot.documents.forEach((docSnap) {
+          print("Phone: ${docSnap.data["PhoneNumber"]}");
+        });
+      }).catchError((e) {
+        print("Error: $e");
+      });
 
       await Firestore.instance
           .collection('Users 2.0')
@@ -453,37 +490,5 @@ class _UdhariFormState extends State<UdhariForm> {
     } else {
       print("Form data NOT saved");
     }
-  }
-}
-
-class ContactsProvider {
-  List<Contact> phoneContacts = List();
-  Iterable<Contact> contacts;
-
-  ContactsProvider() {
-    assignContacts();
-  }
-
-  assignContacts() async {
-    contacts = await ContactsService.getContacts();
-    for (Contact c in contacts) {
-      phoneContacts.add(c);
-    }
-  }
-
-  List<String> getSuggestions(String query) {
-    List<Contact> matches = List();
-    List<String> matchesNames = List();
-    matches.addAll(phoneContacts);
-
-    matches.retainWhere(
-        (s) => s.displayName.toLowerCase().contains(query.toLowerCase()));
-    matches.forEach((f) {
-      matchesNames.add(f.displayName);
-      // print("matchesNames: $matchesNames");
-      // print("matches: ${f.displayName}");
-    });
-    // print("matchesNames: $matchesNames");
-    return matchesNames;
   }
 }

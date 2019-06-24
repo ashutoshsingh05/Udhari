@@ -4,7 +4,6 @@ import 'package:udhari_2/Models/UdhariClass.dart';
 import 'package:udhari_2/Models/TripClass.dart';
 import 'package:udhari_2/Models/HistoryClass.dart';
 
-
 class User {
   String phoneNumber;
   String uid;
@@ -42,4 +41,3 @@ class User {
     };
   }
 }
-
