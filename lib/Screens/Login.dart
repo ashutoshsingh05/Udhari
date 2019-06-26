@@ -122,6 +122,7 @@ class _LoginState extends State<Login> {
       "Name": user.displayName,
       "Email": user.email,
       "PhoneNumber": user.phoneNumber,
+      "uid": user.uid,
     });
   }
 }

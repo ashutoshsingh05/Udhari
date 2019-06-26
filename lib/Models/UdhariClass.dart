@@ -26,7 +26,7 @@ class Udhari {
       "isBorrowed": isBorrowed,
       "isPaid": isPaid,
       "epochTime": udhari.epochTime,
-      "isPaid": isPaid,
+      "displayPicture": udhari.displayPicture,
     };
   }
 }

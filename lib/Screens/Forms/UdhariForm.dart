@@ -411,6 +411,7 @@ class _UdhariFormState extends State<UdhariForm> {
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
       String _time = DateTime.now().millisecondsSinceEpoch.toString();
+      String uid;
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
       expenses = Expenses(
@@ -432,7 +433,7 @@ class _UdhariFormState extends State<UdhariForm> {
         isPaid: false,
       );
       print(
-          "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[0]}");
+          "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[1]}");
       // var db = Firestore.instance;
       // db.runTransaction((transactionHandler) {
       //   transactionHandler
@@ -441,16 +442,33 @@ class _UdhariFormState extends State<UdhariForm> {
       //         print("Phone number: ${snapshot.data["phoneNumber"]}");
       //       });
       // });
-      var query = await Firestore.instance
+      await Firestore.instance
           .collection("Users 2.0")
           .where("PhoneNumber",
-              isEqualTo: _contactsProvider
-                  .getPhoneNumbers(personNameController.text)[1])
+              isEqualTo: (_contactsProvider
+                  .getPhoneNumbers(personNameController.text))[1])
           .getDocuments()
-          .then((snapshot) {
-        snapshot.documents.forEach((docSnap) {
-          print("Phone: ${docSnap.data["PhoneNumber"]}");
+          .then((docSnap) {
+        print("docSnap: ${docSnap.documents}");
+        // docSnap.documents.f.map((f) {
+        //   print("f = ${f.data}");
+        // });
+        docSnap.documents.forEach((f) {
+          print("f = ${f.data}");
+          uid = f.data["uid"];
         });
+      });
+      // Firestore.instance.runTransaction((transactionHandler) {
+      //   return transactionHandler.set(query, udhari.toJson());
+      // });
+      await Firestore.instance
+          .collection("Users 2.0")
+          .document(uid)
+          .collection("Udhari")
+          .document(_time)
+          .setData(udhari.toJson())
+          .then((onValue) {
+        print("Data added to receipent");
       }).catchError((e) {
         print("Error: $e");
       });
