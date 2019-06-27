@@ -488,17 +488,19 @@ class _UdhariFormState extends State<UdhariForm> {
         udhari.expense.photoUrl = widget.user.photoUrl;
         udhari.expense.personName = widget.user.displayName;
         udhari.isBorrowed = !udhari.isBorrowed;
-        await Firestore.instance
-            .collection("Users 2.0")
-            .document(recipientUid)
-            .collection("Udhari")
-            .document(_time)
-            .setData(udhari.toJson())
-            .then((_) {
-          print("Data added to receipent profile");
-        }).catchError((e) {
-          print("Error: $e");
-        });
+        if (recipientUid != null) {
+          await Firestore.instance
+              .collection("Users 2.0")
+              .document(recipientUid)
+              .collection("Udhari")
+              .document(_time)
+              .setData(udhari.toJson())
+              .then((_) {
+            print("Data added to receipent profile");
+          }).catchError((e) {
+            print("Error: $e");
+          });
+        }
 
         _formKey.currentState.reset();
         _overlayEntry.remove();

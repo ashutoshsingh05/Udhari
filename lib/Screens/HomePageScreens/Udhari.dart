@@ -136,127 +136,131 @@ class _UdhariState extends State<Udhari> {
       @required String photoUrl}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      child: GestureDetector(
-        // onTap: () {
-        //   _editCard(amount, expenseContext, dateTime);
-        // },
-        // onLongPress: () {
-        //   return showDialog(
-        //     context: context,
-        //     barrierDismissible: true,
-        //     builder: (BuildContext context) {
-        //       return AlertDialog(
-        //         title: Text("Confirm Deletion"),
-        //         content: Text("Are you sure you wish to delete this record?"),
-        //         actions: <Widget>[
-        //           FlatButton(
-        //             child: Text("OK"),
-        //             onPressed: () async {
-        //               Navigator.of(context).pop();
-        //               await colRef.document('$epochTime').delete().then((_) {
-        //                 print("Document Deleted Successfully");
-        //               });
-        //             },
-        //           ),
-        //           FlatButton(
-        //             child: Text("Cancel"),
-        //             onPressed: () {
-        //               Navigator.of(context).pop();
-        //             },
-        //           ),
-        //         ],
-        //       );
-        //     },
-        //   );
-        // },
-        child: Card(
-          elevation: 5,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundImage:
-                      CachedNetworkImageProvider(photoUrl??""),
-                ),
-                dense: true,
-                isThreeLine: true,
-                title: Text(
-                  "$personName",
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        expenseContext,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 3,
-                        textScaleFactor: 0.9,
-                      ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        "$dateTime",
-                        textScaleFactor: 0.9,
-                      ),
-                    ],
-                  ),
-                ),
-                trailing: SizedBox(
-                  width: 80,
-                  child: Center(
-                    child: Text(
-                      '₹${amount.floor()}',
-                      textScaleFactor: 1.3,
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  _editCard(amount, expenseContext, dateTime);
-                },
-                onLongPress: () {
-                  return showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Confirm Deletion"),
-                        content: Text(
-                            "Are you sure you wish to delete this record?"),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text("OK"),
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              await colRef
-                                  .document('$epochTime')
-                                  .delete()
-                                  .then((_) {
-                                print("Document Deleted Successfully");
-                              });
-                            },
-                          ),
-                          FlatButton(
-                            child: Text("Cancel"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
+      // child: GestureDetector(
+      // onTap: () {
+      //   _editCard(amount, expenseContext, dateTime);
+      // },
+      // onLongPress: () {
+      //   return showDialog(
+      //     context: context,
+      //     barrierDismissible: true,
+      //     builder: (BuildContext context) {
+      //       return AlertDialog(
+      //         title: Text("Confirm Deletion"),
+      //         content: Text("Are you sure you wish to delete this record?"),
+      //         actions: <Widget>[
+      //           FlatButton(
+      //             child: Text("OK"),
+      //             onPressed: () async {
+      //               Navigator.of(context).pop();
+      //               await colRef.document('$epochTime').delete().then((_) {
+      //                 print("Document Deleted Successfully");
+      //               });
+      //             },
+      //           ),
+      //           FlatButton(
+      //             child: Text("Cancel"),
+      //             onPressed: () {
+      //               Navigator.of(context).pop();
+      //             },
+      //           ),
+      //         ],
+      //       );
+      //     },
+      //   );
+      // },
+      child: Card(
+        elevation: 5,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: photoUrl == null
+                    ? AssetImage("assets/questionMark.jpg")
+                    : CachedNetworkImageProvider(photoUrl),
               ),
-            ],
-          ),
+              dense: true,
+              isThreeLine: true,
+              title: Text(
+                "$personName",
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      expenseContext,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      textScaleFactor: 0.9,
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      "$dateTime",
+                      textScaleFactor: 0.9,
+                    ),
+                  ],
+                ),
+              ),
+              trailing: SizedBox(
+                width: 80,
+                child: Center(
+                  child: Text(
+                    '₹${amount.floor()}',
+                    textScaleFactor: 1.3,
+                  ),
+                ),
+              ),
+              onTap: () {
+                _editCard(amount, expenseContext, dateTime);
+              },
+              onLongPress: () {
+                return showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Confirm Deletion"),
+                      content: Text(
+                        "Are you sure you wish to delete this record?",
+                      ),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text("OK"),
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await colRef
+                                .document('$epochTime')
+                                .delete()
+                                .then((_) {
+                              print("Document Deleted Successfully");
+                            }).catchError((e) {
+                              print("Error deleting record: $e");
+                            });
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("Cancel"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
       ),
+      // ),
     );
   }
 

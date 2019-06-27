@@ -231,7 +231,7 @@ class _DashboardState extends State<Dashboard> {
       double amount, String expenseContext, String dateTime, String epochTime) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      child: GestureDetector(
+      // child: GestureDetector(
         // onTap: () {
         //   _editCard(amount, expenseContext, dateTime);
         // },
@@ -343,7 +343,7 @@ class _DashboardState extends State<Dashboard> {
             ],
           ),
         ),
-      ),
+      // ),
     );
   }
 
