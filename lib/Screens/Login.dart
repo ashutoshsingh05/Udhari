@@ -123,6 +123,7 @@ class _LoginState extends State<Login> {
       "Email": user.email,
       "PhoneNumber": user.phoneNumber,
       "uid": user.uid,
+      "photoUrl":user.photoUrl,
     });
   }
 }

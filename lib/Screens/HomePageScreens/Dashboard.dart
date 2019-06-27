@@ -232,37 +232,38 @@ class _DashboardState extends State<Dashboard> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: GestureDetector(
-        onTap: () {
-          _editCard(amount, expenseContext, dateTime);
-        },
-        onLongPress: () {
-          return showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Confirm Deletion"),
-                  content: Text("Are you sure you wish to delete this record?"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await colRef.document('$epochTime').delete().then((_) {
-                          print("Document Deleted Successfully");
-                        });
-                      },
-                    ),
-                    FlatButton(
-                      child: Text("Cancel"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
-        },
+        // onTap: () {
+        //   _editCard(amount, expenseContext, dateTime);
+        // },
+        // onLongPress: () {
+        //   return showDialog(
+        //     context: context,
+        //     barrierDismissible: true,
+        //     builder: (BuildContext context) {
+        //       return AlertDialog(
+        //         title: Text("Confirm Deletion"),
+        //         content: Text("Are you sure you wish to delete this record?"),
+        //         actions: <Widget>[
+        //           FlatButton(
+        //             child: Text("OK"),
+        //             onPressed: () async {
+        //               Navigator.of(context).pop();
+        //               await colRef.document('$epochTime').delete().then((_) {
+        //                 print("Document Deleted Successfully");
+        //               });
+        //             },
+        //           ),
+        //           FlatButton(
+        //             child: Text("Cancel"),
+        //             onPressed: () {
+        //               Navigator.of(context).pop();
+        //             },
+        //           ),
+        //         ],
+        //       );
+        //     },
+        //   );
+        // },
         child: Card(
           elevation: 5,
           child: Column(
@@ -302,6 +303,42 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
+                onTap: () {
+                  _editCard(amount, expenseContext, dateTime);
+                },
+                onLongPress: () {
+                  return showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Confirm Deletion"),
+                        content: Text(
+                            "Are you sure you wish to delete this record?"),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("OK"),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              await colRef
+                                  .document('$epochTime')
+                                  .delete()
+                                  .then((_) {
+                                print("Document Deleted Successfully");
+                              });
+                            },
+                          ),
+                          FlatButton(
+                            child: Text("Cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),

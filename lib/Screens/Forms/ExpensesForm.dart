@@ -220,7 +220,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
       String _time = DateTime.now().millisecondsSinceEpoch.toString();
 
       Expenses expenses = Expenses(
-        displayPicture: widget.user.photoUrl,
+        photoUrl: widget.user.photoUrl,
         dateTime: dateController.text == ""
             ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma").format(DateTime.now())
             : dateController.text,

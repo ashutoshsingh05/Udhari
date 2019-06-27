@@ -3,21 +3,21 @@ import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class History {
   Expenses history;
-  String category;
+  String source;
 
   History({
-    @required this.category,
+    @required this.source,
     @required this.history,
   });
 
   History.fromSnapshot(snapshot) {
-    category = snapshot.data['category'];
+    source = snapshot.data['source'];
     history = snapshot.data['history'];
   }
 
   toJson() {
     return {
-      "category": category,
+      "source": source,
       "history": history,
     };
   }

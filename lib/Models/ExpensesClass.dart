@@ -6,15 +6,16 @@ class Expenses {
   String context;
   String personName;
   String epochTime;
-  String displayPicture;
+  String photoUrl;
 
-  Expenses(
-      {@required this.amount,
-      @required this.context,
-      @required this.dateTime,
-      @required this.personName,
-      @required this.epochTime,
-      @required this.displayPicture});
+  Expenses({
+    @required this.amount,
+    @required this.context,
+    @required this.dateTime,
+    @required this.personName,
+    @required this.epochTime,
+    @required this.photoUrl,
+  });
 
   Expenses.fromSnapshot(snapshot) {
     dateTime = snapshot.data['dateTime'];
@@ -22,7 +23,7 @@ class Expenses {
     context = snapshot.data['context'];
     personName = snapshot.data['personName'];
     epochTime = snapshot.data['epochTime'];
-    displayPicture = snapshot.data['displayPicture'];
+    photoUrl = snapshot.data['photoUrl'];
   }
 
   toJson() {
@@ -32,7 +33,7 @@ class Expenses {
       "context": context,
       "personName": personName,
       "epochTime": epochTime,
-      "displayPicture": displayPicture,
+      "photoUrl": photoUrl,
     };
   }
 }

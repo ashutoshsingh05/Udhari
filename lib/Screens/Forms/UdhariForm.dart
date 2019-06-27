@@ -410,38 +410,12 @@ class _UdhariFormState extends State<UdhariForm> {
 
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
-      String _time = DateTime.now().millisecondsSinceEpoch.toString();
-      String uid;
+      final String _time = DateTime.now().millisecondsSinceEpoch.toString();
+      String recipientUid;
+      String recipientPhoto;
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
-      expenses = Expenses(
-        displayPicture: "",
-        dateTime: dateController.text == ""
-            ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")
-                .format(DateTime.now())
-                .toString()
-            : dateController.text,
-        amount: double.parse(amountController.text),
-        context: contextController.text,
-        personName: personNameController.text,
-        epochTime: _time,
-      );
 
-      udhari = Udhari(
-        udhari: expenses,
-        isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
-        isPaid: false,
-      );
-      print(
-          "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[1]}");
-      // var db = Firestore.instance;
-      // db.runTransaction((transactionHandler) {
-      //   transactionHandler
-      //       .get(db.collection("Users 2.0").document())
-      //       .then((DocumentSnapshot snapshot) {
-      //         print("Phone number: ${snapshot.data["phoneNumber"]}");
-      //       });
-      // });
       await Firestore.instance
           .collection("Users 2.0")
           .where("PhoneNumber",
@@ -450,28 +424,58 @@ class _UdhariFormState extends State<UdhariForm> {
           .getDocuments()
           .then((docSnap) {
         print("docSnap: ${docSnap.documents}");
-        // docSnap.documents.f.map((f) {
-        //   print("f = ${f.data}");
-        // });
         docSnap.documents.forEach((f) {
           print("f = ${f.data}");
-          uid = f.data["uid"];
+          recipientUid = f.data["uid"];
+          recipientPhoto = f.data["photoUrl"];
         });
       });
-      // Firestore.instance.runTransaction((transactionHandler) {
-      //   return transactionHandler.set(query, udhari.toJson());
+
+      expenses = Expenses(
+        photoUrl: recipientPhoto,
+        amount: double.parse(amountController.text),
+        context: contextController.text,
+        personName: personNameController.text,
+        epochTime: _time,
+        dateTime: dateController.text == ""
+            ? DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")
+                .format(DateTime.now())
+                .toString()
+            : dateController.text,
+      );
+
+      udhari = Udhari(
+        expense: expenses,
+        isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
+        isPaid: false,
+      );
+      // print(
+      //     "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[1]}");
+      // await Firestore.instance
+      //     .collection("Users 2.0")
+      //     .where("PhoneNumber",
+      //         isEqualTo: (_contactsProvider
+      //             .getPhoneNumbers(personNameController.text))[1])
+      //     .getDocuments()
+      //     .then((docSnap) {
+      //   print("docSnap: ${docSnap.documents}");
+      //   docSnap.documents.forEach((f) {
+      //     print("f = ${f.data}");
+      //     recipientUid = f.data["uid"];
+      //     recipientPhoto = f.data["photoUrl"];
+      //   });
       // });
-      await Firestore.instance
-          .collection("Users 2.0")
-          .document(uid)
-          .collection("Udhari")
-          .document(_time)
-          .setData(udhari.toJson())
-          .then((onValue) {
-        print("Data added to receipent");
-      }).catchError((e) {
-        print("Error: $e");
-      });
+      // await Firestore.instance
+      //     .collection("Users 2.0")
+      //     .document(recipientUid)
+      //     .collection("Udhari")
+      //     .document(_time)
+      //     .setData(udhari.toJson())
+      //     .then((onValue) {
+      //   print("Data added to receipent");
+      // }).catchError((e) {
+      //   print("Error: $e");
+      // });
 
       await Firestore.instance
           .collection('Users 2.0')
@@ -479,8 +483,23 @@ class _UdhariFormState extends State<UdhariForm> {
           .collection('Udhari')
           .document(_time)
           .setData(udhari.toJson())
-          .then((_) {
+          .then((_) async {
         print("Data Successfully saved to cloud!");
+        udhari.expense.photoUrl = widget.user.photoUrl;
+        udhari.expense.personName = widget.user.displayName;
+        udhari.isBorrowed = !udhari.isBorrowed;
+        await Firestore.instance
+            .collection("Users 2.0")
+            .document(recipientUid)
+            .collection("Udhari")
+            .document(_time)
+            .setData(udhari.toJson())
+            .then((_) {
+          print("Data added to receipent profile");
+        }).catchError((e) {
+          print("Error: $e");
+        });
+
         _formKey.currentState.reset();
         _overlayEntry.remove();
         Navigator.pop(context);

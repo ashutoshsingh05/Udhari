@@ -2,31 +2,31 @@ import 'package:flutter/cupertino.dart';
 import 'package:udhari_2/Models/ExpensesClass.dart';
 
 class Udhari {
-  Expenses udhari;
+  Expenses expense;
   bool isBorrowed;
   bool isPaid;
 
   Udhari({
     @required this.isBorrowed,
-    @required this.udhari,
+    @required this.expense,
     @required this.isPaid,
   });
 
   Udhari.fromSnapshot(snapshot) {
-    udhari = snapshot.data['udhari'];
+    expense = snapshot.data['expense'];
     isBorrowed = snapshot.data['isBorrowed'];
   }
 
   toJson() {
     return {
-      "dateTime": udhari.dateTime,
-      "amount": udhari.amount,
-      "context": udhari.context,
-      "personName": udhari.personName,
+      "dateTime": expense.dateTime,
+      "amount": expense.amount,
+      "context": expense.context,
+      "personName": expense.personName,
       "isBorrowed": isBorrowed,
       "isPaid": isPaid,
-      "epochTime": udhari.epochTime,
-      "displayPicture": udhari.displayPicture,
+      "epochTime": expense.epochTime,
+      "photoUrl": expense.photoUrl,
     };
   }
 }
