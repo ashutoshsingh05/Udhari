@@ -176,9 +176,8 @@ class _UdhariState extends State<Udhari> {
           children: <Widget>[
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: photoUrl == null
-                    ? AssetImage("assets/questionMark.jpg")
-                    : CachedNetworkImageProvider(photoUrl),
+                backgroundImage: CachedNetworkImageProvider(photoUrl ??
+                    "https://api.adorable.io/avatars/100/$personName.png"),
               ),
               dense: true,
               isThreeLine: true,

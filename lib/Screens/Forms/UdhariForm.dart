@@ -423,11 +423,13 @@ class _UdhariFormState extends State<UdhariForm> {
                   .getPhoneNumbers(personNameController.text))[1])
           .getDocuments()
           .then((docSnap) {
-        print("docSnap: ${docSnap.documents}");
+        // print("docSnap: ${docSnap.documents}");
         docSnap.documents.forEach((f) {
-          print("f = ${f.data}");
+          // print("f = ${f.data}");
           recipientUid = f.data["uid"];
           recipientPhoto = f.data["photoUrl"];
+          print("Recipent UID: $recipientUid");
+          print("Recipent Photo: $recipientPhoto");
         });
       });
 
@@ -449,33 +451,6 @@ class _UdhariFormState extends State<UdhariForm> {
         isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
         isPaid: false,
       );
-      // print(
-      //     "Phones: ${_contactsProvider.getPhoneNumbers(personNameController.text)[1]}");
-      // await Firestore.instance
-      //     .collection("Users 2.0")
-      //     .where("PhoneNumber",
-      //         isEqualTo: (_contactsProvider
-      //             .getPhoneNumbers(personNameController.text))[1])
-      //     .getDocuments()
-      //     .then((docSnap) {
-      //   print("docSnap: ${docSnap.documents}");
-      //   docSnap.documents.forEach((f) {
-      //     print("f = ${f.data}");
-      //     recipientUid = f.data["uid"];
-      //     recipientPhoto = f.data["photoUrl"];
-      //   });
-      // });
-      // await Firestore.instance
-      //     .collection("Users 2.0")
-      //     .document(recipientUid)
-      //     .collection("Udhari")
-      //     .document(_time)
-      //     .setData(udhari.toJson())
-      //     .then((onValue) {
-      //   print("Data added to receipent");
-      // }).catchError((e) {
-      //   print("Error: $e");
-      // });
 
       await Firestore.instance
           .collection('Users 2.0')
@@ -485,10 +460,11 @@ class _UdhariFormState extends State<UdhariForm> {
           .setData(udhari.toJson())
           .then((_) async {
         print("Data Successfully saved to cloud!");
-        udhari.expense.photoUrl = widget.user.photoUrl;
-        udhari.expense.personName = widget.user.displayName;
-        udhari.isBorrowed = !udhari.isBorrowed;
+
         if (recipientUid != null) {
+          udhari.expense.photoUrl = widget.user.photoUrl;
+          udhari.expense.personName = widget.user.displayName;
+          udhari.isBorrowed = !udhari.isBorrowed;
           await Firestore.instance
               .collection("Users 2.0")
               .document(recipientUid)
@@ -498,8 +474,10 @@ class _UdhariFormState extends State<UdhariForm> {
               .then((_) {
             print("Data added to receipent profile");
           }).catchError((e) {
-            print("Error: $e");
+            print("Error commiting recipient data: $e");
           });
+        } else {
+          print("Receipent not using Udhari, Not commiting to cloud");
         }
 
         _formKey.currentState.reset();
