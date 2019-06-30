@@ -97,7 +97,7 @@ class _UdhariFormState extends State<UdhariForm> {
                         onChanged: (newValue) {
                           setState(() {
                             udhariTypeValue = newValue;
-                            print("Changed to new Value: $newValue");
+                            print("Udhari Type: $newValue");
                           });
                         },
                         hint: Text("Udhari Type"),
@@ -124,25 +124,6 @@ class _UdhariFormState extends State<UdhariForm> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
-                    // child: DropdownButtonFormField(
-                    //   value: personNamevalue,
-                    //   items: myContacts,
-                    //   onChanged: (newPerson) {
-                    //     setState(() {
-                    //       personNamevalue = newPerson;
-                    //     });
-                    //   },
-                    //   hint: Text("Select Name"),
-                    //   validator: (value) {
-                    //     if (value == null) {
-                    //       return "Name cannot be empty!";
-                    //     }
-                    //     return null;
-                    //   },
-                    //   decoration: InputDecoration(
-                    //     icon: Icon(Icons.account_circle),
-                    //   ),
-                    // ),
                     child: TypeAheadFormField(
                       textFieldConfiguration: TextFieldConfiguration(
                         focusNode: personNameFocus,
@@ -195,7 +176,6 @@ class _UdhariFormState extends State<UdhariForm> {
                         enableInteractiveSelection: false,
                         textInputAction: TextInputAction.next,
                         focusNode: amountFocus,
-                        // maxLength: 6,
                         onEditingComplete: () {
                           FocusScope.of(context).requestFocus(contextFocus);
                         },
@@ -243,9 +223,6 @@ class _UdhariFormState extends State<UdhariForm> {
                       textCapitalization: TextCapitalization.sentences,
                       maxLines: null,
                       focusNode: contextFocus,
-                      // onEditingComplete: () {
-                      //   FocusScope.of(context).requestFocus(dateFocus);
-                      // },
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Context cannot be empty!";
@@ -279,13 +256,6 @@ class _UdhariFormState extends State<UdhariForm> {
                       inputType: InputType.both,
                       format: formats[InputType.both],
                       editable: false,
-                      // focusNode: dateFocus,
-                      // validator: (value) {
-                      //   if (value == null || value.toString() == "") {
-                      //     return "Date cannot be empty!";
-                      //   }
-                      //   return null;
-                      // },
                       decoration: InputDecoration(
                         helperText: "(Optional)",
                         icon: Icon(Icons.today),
@@ -351,62 +321,13 @@ class _UdhariFormState extends State<UdhariForm> {
         } else {
           print("Initializing contacts");
           _contactsProvider = ContactsProvider();
-          // contactNameListBuilder();
         }
       }
     } else {
       print("Initializing contacts");
       _contactsProvider = ContactsProvider();
-      // contactNameListBuilder();
     }
   }
-
-  // contactNameListBuilder() async {
-  //   myContacts = List<DropdownMenuItem>();
-  //   Iterable<Contact> contacts = await ContactsService.getContacts();
-  //   setState(() {
-  //     for (Contact c in contacts) {
-  //       print("Contact: ${c.displayName}");
-  //       for (Item i in c.phones) {
-  //         String number = i.value;
-  //         if (number.length > 10) {
-  //           number = number
-  //               .replaceAll(" ", "")
-  //               .replaceAll("+", "")
-  //               .replaceAll("-", "")
-  //               .trim();
-  //           number = number.substring(number.length - 10, number.length);
-  //           print("Number: $number");
-  //         }
-  //         myContacts.add(
-  //           DropdownMenuItem(
-  //             // child: RichText(
-  //             //   text: TextSpan(
-  //             //     children: [
-  //             //       TextSpan(
-  //             //         text: c.displayName,
-  //             //         style: TextStyle(fontSize: 14, color: Colors.black),
-  //             //       ),
-  //             //       TextSpan(
-  //             //         text: ", $number",
-  //             //         style: TextStyle(fontSize: 12, color: Colors.grey),
-  //             //       ),
-  //             //     ],
-  //             //   ),
-  //             //   maxLines: 1,
-  //             //   overflow: TextOverflow.ellipsis,
-  //             // ),
-  //             child: ListTile(
-  //               title: Text(c.displayName),
-  //             ),
-  //             value: number,
-  //           ),
-  //         );
-  //       }
-  //     }
-  //   });
-  //   // print("Contacts: $contacts");
-  // }
 
   void _validateAndSave() async {
     if (_formKey.currentState.validate() == true) {
@@ -423,9 +344,8 @@ class _UdhariFormState extends State<UdhariForm> {
                   .getPhoneNumbers(personNameController.text))[1])
           .getDocuments()
           .then((docSnap) {
-        // print("docSnap: ${docSnap.documents}");
         docSnap.documents.forEach((f) {
-          // print("f = ${f.data}");
+          print("Document Exists: ${f.exists}");
           recipientUid = f.data["uid"];
           recipientPhoto = f.data["photoUrl"];
           print("Recipent UID: $recipientUid");

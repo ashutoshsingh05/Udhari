@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:googleapis/people/v1.dart' show PeopleApi;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' show BaseRequest, Response, StreamedResponse;
+import 'package:http/io_client.dart';
+import 'dart:async' show Future;
 
 class Login extends StatefulWidget {
   @override
@@ -35,10 +39,10 @@ class _LoginState extends State<Login> {
     scopes: [
       'email',
       'https://www.googleapis.com/auth/user.phonenumbers.read',
-      // 'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -115,15 +119,43 @@ class _LoginState extends State<Login> {
   }
 
   void _setBasicData(FirebaseUser user) async {
+    final authHeaders = await _googleSignIn.currentUser.authHeaders;
+    final httpClient = GoogleHttpClient(authHeaders);
+    String phoneNumber;
+
+    await PeopleApi(httpClient)
+        .people
+        .get('people/me', requestMask_includeField: "person.phoneNumbers")
+        .then((person) {
+      print("First Phone Number: ${person.phoneNumbers.first.value}");
+      phoneNumber = person.phoneNumbers.first.value;
+    }).catchError((e) {
+      print("Found Error retrieving phone number: $e");
+    });
+
     await Firestore.instance
         .collection('Users 2.0')
         .document(user.uid)
         .setData({
       "Name": user.displayName,
       "Email": user.email,
-      "PhoneNumber": user.phoneNumber,
+      "PhoneNumber": phoneNumber,
       "uid": user.uid,
-      "photoUrl":user.photoUrl,
+      "photoUrl": user.photoUrl,
     });
   }
+}
+
+class GoogleHttpClient extends IOClient {
+  Map<String, String> _headers;
+
+  GoogleHttpClient(this._headers) : super();
+
+  @override
+  Future<StreamedResponse> send(BaseRequest request) =>
+      super.send(request..headers.addAll(_headers));
+
+  @override
+  Future<Response> head(Object url, {Map<String, String> headers}) =>
+      super.head(url, headers: headers..addAll(_headers));
 }
