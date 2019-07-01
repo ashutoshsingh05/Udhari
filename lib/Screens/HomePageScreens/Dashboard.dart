@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
 
 class Dashboard extends StatefulWidget {
@@ -74,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
                     CachedNetworkImageProvider("${widget.user.photoUrl}"),
               ),
             ),
-            title: Text(widget.user.displayName),
+            title: Text(widget.user.displayName??"Unknown"),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.refresh),
@@ -378,7 +378,9 @@ class _DashboardState extends State<Dashboard> {
 
   void _signOut() async {
     await FirebaseAuth.instance.signOut();
-    await GoogleSignIn().signOut();
+    // await GoogleSignIn().signOut();
+    var _auth=FirebaseAuth.instance;
+    _auth.signOut();
     print("Logged out");
   }
 

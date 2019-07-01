@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/UdhariForm.dart';
 
 class Udhari extends StatefulWidget {
@@ -127,13 +127,14 @@ class _UdhariState extends State<Udhari> {
     );
   }
 
-  Widget _cardBuilder(
-      {@required String personName,
-      @required double amount,
-      @required String expenseContext,
-      @required String dateTime,
-      @required String epochTime,
-      @required String photoUrl}) {
+  Widget _cardBuilder({
+    @required String personName,
+    @required double amount,
+    @required String expenseContext,
+    @required String dateTime,
+    @required String epochTime,
+    @required String photoUrl,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       // child: GestureDetector(
@@ -176,8 +177,7 @@ class _UdhariState extends State<Udhari> {
           children: <Widget>[
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(photoUrl ??
-                    "https://api.adorable.io/avatars/100/$personName.png"),
+                backgroundImage: CachedNetworkImageProvider(photoUrl),
               ),
               dense: true,
               isThreeLine: true,
@@ -282,7 +282,9 @@ class _UdhariState extends State<Udhari> {
 
   void _signOut() async {
     await FirebaseAuth.instance.signOut();
-    await GoogleSignIn().signOut();
+    // await GoogleSignIn().signOut();
+    var _auth = FirebaseAuth.instance;
+    _auth.signOut();
     print("Logged out");
   }
 }
