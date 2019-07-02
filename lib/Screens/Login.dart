@@ -141,13 +141,15 @@ class _LoginState extends State<Login> {
     print("Phone: ${_countryCode + _phoneNumberController.text}");
     await _auth.verifyPhoneNumber(
       phoneNumber: _countryCode + _phoneNumberController.text,
-      codeSent: (String verficationID, [int resendcodeTimeout]) {},
+      codeSent: (String verficationID, [int resendcodeTimeout]) {
+        print("Code Sent to device");
+      },
       timeout: Duration(seconds: 60),
       verificationFailed: (AuthException exception) {
         print("Verification Failed: $exception");
         _overlayEntry.remove();
         Fluttertoast.showToast(
-          msg: "Error signing in",
+          msg: "Error occured. Please try again later",
           backgroundColor: Colors.grey,
           gravity: ToastGravity.BOTTOM,
         );
@@ -155,8 +157,8 @@ class _LoginState extends State<Login> {
       verificationCompleted: (AuthCredential credentials) async {
         print("Verification Complete");
         await _auth.signInWithCredential(credentials).then((user) async {
-          await _setBasicData(user);
           _overlayEntry.remove();
+          await _setBasicData(user);
           Fluttertoast.showToast(
             msg: "Successfully Signed in",
             backgroundColor: Colors.grey,
@@ -175,9 +177,9 @@ class _LoginState extends State<Login> {
     userInfo.displayName = _phoneNumberController.text;
     userInfo.photoUrl =
         "https://api.adorable.io/avatars/100/${user.phoneNumber}.png";
-    await user.updateProfile(userInfo).then((_) async{
+    print("UserInfoUpdated: ${userInfo}");
+    await user.updateProfile(userInfo).then((_) {
       print("Profile updated ");
-      user.reload();
     }).catchError((e) {
       print("Error updating profile: $e");
     });
@@ -192,16 +194,4 @@ class _LoginState extends State<Login> {
       "photoUrl": user.photoUrl,
     });
   }
-
-  // List<DropdownMenuItem> contryCodes() {
-  //   List<DropdownMenuItem> codes = List();
-  //   for (int i = 1; i < 250; i++) {
-  //     var item = DropdownMenuItem(
-  //       child: Text("+$i"),
-  //       value: "+$i",
-  //     );
-  //     codes.add(item);
-  //   }
-  //   return codes;
-  // }
 }
