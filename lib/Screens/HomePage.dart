@@ -27,12 +27,18 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     screens = ScreenHandler(Dashboard(user: widget.user), widget.user);
+    printProfile();
   }
 
   @override
   void dispose() {
     screens.close();
     super.dispose();
+  }
+
+  printProfile() {
+    print(
+        "======================================\nPROFILE\ndisplayName:${widget.user.displayName}\nphotoUrl:${widget.user.photoUrl}\nphoneNumber:${widget.user.phoneNumber}\nuid:${widget.user.uid}\n======================================");
   }
 
   @override

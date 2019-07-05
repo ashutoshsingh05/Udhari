@@ -24,6 +24,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   AnimationController _controllerCredit;
   AnimationController _controllerExp;
   AnimationController _controllerTrip;
+  AnimationController _controllerList;
 
   TextStyle _textStyleHeader = TextStyle(
     fontWeight: FontWeight.w400,
@@ -40,7 +41,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     super.initState();
     colRef = Firestore.instance
         .collection('Users 2.0')
-        .document('${widget.user.uid}')
+        .document('${widget.user.phoneNumber}')
         .collection('Expenses');
     expenseHandler();
     debitHandler();
@@ -62,6 +63,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       duration: Duration(seconds: 1),
       vsync: this,
     );
+    _controllerList = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
     scheduleTimeBombs();
   }
 
@@ -78,6 +83,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     Timer(Duration(milliseconds: 600), () {
       _controllerTrip.forward();
     });
+    Timer(Duration(milliseconds: 800), () {
+      _controllerList.forward();
+    });
   }
 
   @override
@@ -86,6 +94,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     _controllerCredit.dispose();
     _controllerExp.dispose();
     _controllerTrip.dispose();
+    _controllerList.dispose();
     super.dispose();
   }
 
@@ -113,11 +122,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               padding: EdgeInsets.all(5),
               child: CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(
-                  "${widget.user.photoUrl}",
+                  widget.user.photoUrl ??
+                      "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png",
                 ),
               ),
             ),
-            title: Text(widget.user.displayName ?? "Unknown"),
+            title: Text(widget.user.displayName ?? widget.user.phoneNumber),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.refresh),
@@ -273,11 +283,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         child: Column(
                           children: snapshot.data.documents.map(
                             (DocumentSnapshot document) {
-                              return _cardBuilder(
-                                document['amount'],
-                                document['context'],
-                                document['dateTime'],
-                                document['epochTime'],
+                              return ScaleTransition(
+                                scale: CurvedAnimation(
+                                  curve: Curves.elasticOut,
+                                  parent: _controllerList,
+                                ),
+                                child: _cardBuilder(
+                                  document['amount'],
+                                  document['context'],
+                                  document['dateTime'],
+                                  document['epochTime'],
+                                ),
                               );
                             },
                           ).toList(),
@@ -387,7 +403,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         (DateTime.now().millisecondsSinceEpoch - 2592000000).toString();
     QuerySnapshot db = await Firestore.instance
         .collection('Users 2.0')
-        .document(widget.user.uid)
+        .document("${widget.user.phoneNumber}")
         .collection('Expenses')
         .where('epochTime', isGreaterThanOrEqualTo: _time)
         .getDocuments();

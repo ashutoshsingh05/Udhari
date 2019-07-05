@@ -36,11 +36,12 @@ class _TripsState extends State<Trips> {
               leading: Padding(
                 padding: EdgeInsets.all(7),
                 child: CircleAvatar(
-                  backgroundImage:
-                      CachedNetworkImageProvider("${widget.user.photoUrl}"),
+                  backgroundImage: CachedNetworkImageProvider(widget
+                          .user.photoUrl ??
+                      "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png"),
                 ),
               ),
-              title: Text(widget.user.displayName),
+              title: Text(widget.user.displayName ?? widget.user.phoneNumber),
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.more_vert),

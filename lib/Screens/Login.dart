@@ -5,11 +5,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:googleapis/people/v1.dart' show PeopleApi;
-// import 'package:google_sign_in/google_sign_in.dart';
-// import 'package:http/http.dart' show BaseRequest, Response, StreamedResponse;
-// import 'package:http/io_client.dart';
-// import 'dart:async' show Future;
 
 class Login extends StatefulWidget {
   @override
@@ -18,9 +13,16 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   OverlayEntry _overlayEntry;
+
   FirebaseAuth _auth;
+  FirebaseUser user;
+  UserUpdateInfo userInfo;
+
   TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _displayNameController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  FocusNode _numberNode = FocusNode();
+
   String _countryCode = "+91";
 
   @override
@@ -36,6 +38,7 @@ class _LoginState extends State<Login> {
         );
       },
     );
+    userInfo = UserUpdateInfo();
     super.initState();
   }
 
@@ -47,12 +50,12 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-            "Enter your 10 digit mobile number below and relax.\n\n We will verify it automatically for you!",
+            "Enter your 10 digit mobile number below and relax.\n\nWe will verify it automatically for you!",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
@@ -60,56 +63,106 @@ class _LoginState extends State<Login> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 10),
+            padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
             child: Form(
               key: _formKey,
-              child: TextFormField(
-                controller: _phoneNumberController,
-                maxLength: 10,
-                keyboardType: TextInputType.phone,
-                // onChanged: (String newVal) {},
-                inputFormatters: [
-                  WhitelistingTextInputFormatter(
-                    RegExp("[0-9]"),
-                  ),
-                ],
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Please enter your phone number";
-                  }
-                  if (value.length != 10) {
-                    return "Please enter 10 digits";
-                  }
-                },
-                onFieldSubmitted: (_) {
-                  if (_formKey.currentState.validate()) {
-                    Overlay.of(context).insert(_overlayEntry);
-                    _verifyPhoneNumber();
-                  }
-                },
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(color: Colors.white),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12.0),
+              child: Column(
+                children: [
+                  TextFormField(
+                    autocorrect: true,
+                    controller: _displayNameController,
+                    keyboardType: TextInputType.text,
+                    maxLines: 1,
+                    maxLength: 30,
+                    textCapitalization: TextCapitalization.words,
+                    validator: (value) {
+                      value = value.trim();
+                      if (value.isEmpty) {
+                        return "Please Enter your name";
+                      }
+                      if (value.length < 3) {
+                        return "Too short. Consider using your full name";
+                      }
+                    },
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(
+                        RegExp("[a-zA-Z\ ]"),
+                      ),
+                    ],
+                    decoration: InputDecoration(
+                      errorStyle: TextStyle(
+                        color: Colors.white,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                          width: 0,
+                        ),
+                      ),
+                      hintText: "Your name",
+                      prefixIcon: Icon(Icons.person),
                     ),
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 0,
-                    ),
-                  ),
-                  hintText: "10-digit mobile number",
-                  prefixIcon: CountryCodePicker(
-                    initialSelection: "+91",
-                    favorite: ["+91"],
-                    showFlag: true,
-                    onChanged: (code) {
-                      _countryCode = code.dialCode;
+                    onFieldSubmitted: (value) {
+                      FocusScope.of(context).requestFocus(_numberNode);
                     },
                   ),
-                ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextFormField(
+                    controller: _phoneNumberController,
+                    focusNode: _numberNode,
+                    maxLength: 10,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(
+                        RegExp("[0-9]"),
+                      ),
+                    ],
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Please enter your phone number";
+                      }
+                      if (value.length != 10) {
+                        return "Please enter 10 digits";
+                      }
+                    },
+                    onFieldSubmitted: (_) {
+                      if (_formKey.currentState.validate()) {
+                        Overlay.of(context).insert(_overlayEntry);
+                        _verifyPhoneNumber();
+                      }
+                    },
+                    decoration: InputDecoration(
+                      errorStyle: TextStyle(color: Colors.white),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                          width: 0,
+                        ),
+                      ),
+                      hintText: "10-digit mobile number",
+                      prefixIcon: CountryCodePicker(
+                        initialSelection: "+91",
+                        favorite: ["+91"],
+                        showFlag: true,
+                        onChanged: (code) {
+                          _countryCode = code.dialCode;
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -155,10 +208,10 @@ class _LoginState extends State<Login> {
         );
       },
       verificationCompleted: (AuthCredential credentials) async {
-        print("Verification Complete");
-        await _auth.signInWithCredential(credentials).then((user) async {
+        print("Phone Verification Complete");
+        await _auth.signInWithCredential(credentials).then((user) {
+          _setBasicData(user);
           _overlayEntry.remove();
-          await _setBasicData(user);
           Fluttertoast.showToast(
             msg: "Successfully Signed in",
             backgroundColor: Colors.grey,
@@ -167,31 +220,26 @@ class _LoginState extends State<Login> {
         });
       },
       codeAutoRetrievalTimeout: (String verificaionID) {
+        print("Timed out");
         _overlayEntry.remove();
       },
     );
   }
 
   Future<void> _setBasicData(FirebaseUser user) async {
-    UserUpdateInfo userInfo = UserUpdateInfo();
-    userInfo.displayName = _phoneNumberController.text;
+    userInfo.displayName = _displayNameController.text;
     userInfo.photoUrl =
         "https://api.adorable.io/avatars/100/${user.phoneNumber}.png";
-    print("UserInfoUpdated: ${userInfo}");
-    await user.updateProfile(userInfo).then((_) {
-      print("Profile updated ");
-    }).catchError((e) {
-      print("Error updating profile: $e");
-    });
-    // await user.reload();
+    await user.updateProfile(userInfo);
+
     await Firestore.instance
         .collection('Users 2.0')
         .document(user.phoneNumber)
         .setData({
-      "Name": user.displayName,
-      "PhoneNumber": user.phoneNumber,
+      "displayName": _displayNameController.text,
+      "phoneNumber": user.phoneNumber,
       "uid": user.uid,
-      "photoUrl": user.photoUrl,
+      "photoUrl": "https://api.adorable.io/avatars/100/${user.phoneNumber}.png"
     });
   }
 }

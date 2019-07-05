@@ -374,7 +374,7 @@ class _UdhariFormState extends State<UdhariForm> {
 
       await Firestore.instance
           .collection('Users 2.0')
-          .document("${widget.user.uid}")
+          .document("${widget.user.phoneNumber}")
           .collection('Udhari')
           .document(_time)
           .setData(udhari.toJson())
