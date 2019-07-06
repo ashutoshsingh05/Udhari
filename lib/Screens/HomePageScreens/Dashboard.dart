@@ -442,8 +442,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void _signOut() async {
     await FirebaseAuth.instance.signOut();
-    // var _auth = FirebaseAuth.instance;
-    // _auth.signOut();
     print("Logged out");
   }
 
@@ -457,13 +455,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       context,
       PageRouteBuilder(
         opaque: false,
-        pageBuilder: (BuildContext context, _, __) {
-          return ExpensesForm(
-            user: widget.user,
-            amountOpt: amount,
-            contextOpt: expenseContext,
-            dateTimeOpt: datetime,
-            epochTime: epochTime,
+        pageBuilder: (BuildContext context, animation, secondaryAnimation) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(1.0, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: ExpensesForm(
+              user: widget.user,
+              amountOpt: amount,
+              contextOpt: expenseContext,
+              dateTimeOpt: datetime,
+              epochTime: epochTime,
+            ),
           );
         },
       ),

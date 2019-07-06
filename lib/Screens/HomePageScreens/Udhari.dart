@@ -106,12 +106,6 @@ class _UdhariState extends State<Udhari> {
                                 expenseContext: document['context'],
                                 personName: document['personName'],
                                 photoUrl: document['photoUrl'],
-                                // document['personName'],
-                                // document['amount'],
-                                // document['context'],
-                                // document['dateTime'],
-                                // document['epochTime'],
-                                // document['photoUrl'],
                               );
                             },
                           ).toList(),
@@ -138,39 +132,6 @@ class _UdhariState extends State<Udhari> {
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      // child: GestureDetector(
-      // onTap: () {
-      //   _editCard(amount, expenseContext, dateTime);
-      // },
-      // onLongPress: () {
-      //   return showDialog(
-      //     context: context,
-      //     barrierDismissible: true,
-      //     builder: (BuildContext context) {
-      //       return AlertDialog(
-      //         title: Text("Confirm Deletion"),
-      //         content: Text("Are you sure you wish to delete this record?"),
-      //         actions: <Widget>[
-      //           FlatButton(
-      //             child: Text("OK"),
-      //             onPressed: () async {
-      //               Navigator.of(context).pop();
-      //               await colRef.document('$epochTime').delete().then((_) {
-      //                 print("Document Deleted Successfully");
-      //               });
-      //             },
-      //           ),
-      //           FlatButton(
-      //             child: Text("Cancel"),
-      //             onPressed: () {
-      //               Navigator.of(context).pop();
-      //             },
-      //           ),
-      //         ],
-      //       );
-      //     },
-      //   );
-      // },
       child: Card(
         elevation: 5,
         child: Column(
@@ -269,7 +230,7 @@ class _UdhariState extends State<Udhari> {
       context,
       PageRouteBuilder(
         opaque: false,
-        pageBuilder: (BuildContext context, _, __) {
+        pageBuilder: (BuildContext context, animation, secondaryanimation) {
           return UdhariForm(
             user: widget.user,
             // amountOpt: amount,

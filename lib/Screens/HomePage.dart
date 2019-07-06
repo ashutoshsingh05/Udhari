@@ -37,8 +37,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   printProfile() {
-    print(
-        "======================================\nPROFILE\ndisplayName:${widget.user.displayName}\nphotoUrl:${widget.user.photoUrl}\nphoneNumber:${widget.user.phoneNumber}\nuid:${widget.user.uid}\n======================================");
+    print("======================================");
+    print("PROFILE");
+    print("displayName:${widget.user.displayName}");
+    print("photoUrl:${widget.user.photoUrl}");
+    print("phoneNumber:${widget.user.phoneNumber}");
+    print("uid:${widget.user.uid}");
+    print("======================================");
   }
 
   @override
@@ -125,10 +130,16 @@ class _HomePageState extends State<HomePage> {
                 context,
                 PageRouteBuilder(
                   opaque: false,
-                  pageBuilder: (BuildContext context, _, __) {
-                    return ExpensesForm(
-                      user: widget.user,
-                      // streamInstance: totalExpense,
+                  pageBuilder:
+                      (BuildContext context, animation, secondaryAnimation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(1.0, 0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: ExpensesForm(
+                        user: widget.user,
+                      ),
                     );
                   },
                 ),

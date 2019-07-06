@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -71,15 +72,15 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent.withOpacity(0.6),
+      backgroundColor: Colors.blueAccent.withOpacity(0.3),
       appBar: AppBar(
         backgroundColor: Colors.deepPurple.withOpacity(0.5),
         title: Text("Expenses"),
       ),
       body: BackdropFilter(
         filter: ImageFilter.blur(
-          sigmaX: 3.0,
-          sigmaY: 3.0,
+          sigmaX: 6.0,
+          sigmaY: 6.0,
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20),
@@ -96,12 +97,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
                         constraints:
                             BoxConstraints(maxHeight: 80, maxWidth: 200),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
                           controller: amountController,
                           keyboardType: TextInputType.number,
-                          autofocus: true,
+                          // autofocus: true,
                           enableInteractiveSelection: false,
                           textInputAction: TextInputAction.next,
                           focusNode: amountFocus,
