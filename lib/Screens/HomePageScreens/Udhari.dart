@@ -48,7 +48,7 @@ class _UdhariState extends State<Udhari> {
               backgroundColor: Colors.transparent.withOpacity(0),
               elevation: 0,
               leading: Padding(
-                padding: EdgeInsets.all(7),
+                padding: EdgeInsets.all(5),
                 child: CircleAvatar(
                   backgroundImage: CachedNetworkImageProvider(widget
                           .user.photoUrl ??

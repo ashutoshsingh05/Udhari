@@ -13,12 +13,14 @@ class ExpensesForm extends StatefulWidget {
     this.amountOpt,
     this.contextOpt,
     this.dateTimeOpt,
+    this.epochTime,
   });
 
   final FirebaseUser user;
   final double amountOpt;
   final String contextOpt;
   final String dateTimeOpt;
+  final String epochTime;
 
   @override
   _ExpensesFormState createState() => _ExpensesFormState();
@@ -217,7 +219,13 @@ class _ExpensesFormState extends State<ExpensesForm> {
     if (_formKey.currentState.validate() == true) {
       Overlay.of(context).insert(_overlayEntry);
       _formKey.currentState.save();
-      String _time = DateTime.now().millisecondsSinceEpoch.toString();
+
+      //when the doc alredy exists, it must be overwritten
+      //with the given epochTime since a non null epochTime
+      //means doc is being edited otherwise it would
+      //result in duplicate entries on editing the cards
+      String _time =
+          widget.epochTime ?? DateTime.now().millisecondsSinceEpoch.toString();
 
       Expenses expenses = Expenses(
         photoUrl: widget.user.photoUrl,
@@ -232,7 +240,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
       await Firestore.instance
           .collection('Users 2.0')
-          .document("${widget.user.phoneNumber}")
+          .document(widget.user.phoneNumber)
           .collection('Expenses')
           .document(_time)
           .setData(expenses.toJson())

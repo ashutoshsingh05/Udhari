@@ -289,10 +289,14 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   parent: _controllerList,
                                 ),
                                 child: _cardBuilder(
-                                  document['amount'],
-                                  document['context'],
-                                  document['dateTime'],
-                                  document['epochTime'],
+                                  amount: document['amount'],
+                                  dateTime: document['dateTime'],
+                                  epochTime: document['epochTime'],
+                                  expenseContext: document['context'],
+                                  // document['amount'],
+                                  // document['context'],
+                                  // document['dateTime'],
+                                  // document['epochTime'],
                                 ),
                               );
                             },
@@ -310,8 +314,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     );
   }
 
-  Widget _cardBuilder(
-      double amount, String expenseContext, String dateTime, String epochTime) {
+  Widget _cardBuilder({
+    @required double amount,
+    @required String expenseContext,
+    @required String dateTime,
+    @required String epochTime,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Card(
@@ -354,7 +362,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 ),
               ),
               onTap: () {
-                _editCard(amount, expenseContext, dateTime);
+                // _editCard(amount, expenseContext, dateTime);
+                _editCard(
+                  amount: amount,
+                  datetime: dateTime,
+                  epochTime: epochTime,
+                  expenseContext: expenseContext,
+                );
               },
               onLongPress: () {
                 return showDialog(
@@ -428,13 +442,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void _signOut() async {
     await FirebaseAuth.instance.signOut();
-    // await GoogleSignIn().signOut();
-    var _auth = FirebaseAuth.instance;
-    _auth.signOut();
+    // var _auth = FirebaseAuth.instance;
+    // _auth.signOut();
     print("Logged out");
   }
 
-  void _editCard(double amount, String expenseContext, String datetime) {
+  void _editCard({
+    @required double amount,
+    @required String expenseContext,
+    @required String datetime,
+    @required String epochTime,
+  }) {
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -445,6 +463,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             amountOpt: amount,
             contextOpt: expenseContext,
             dateTimeOpt: datetime,
+            epochTime: epochTime,
           );
         },
       ),
