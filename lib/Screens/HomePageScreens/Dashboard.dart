@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
 
 class Dashboard extends StatefulWidget {
@@ -41,7 +39,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     super.initState();
     colRef = Firestore.instance
         .collection('Users 2.0')
-        .document('${widget.user.phoneNumber}')
+        .document('${widget.user.phoneNumber.substring(widget.user.phoneNumber.length - 10)}')
         .collection('Expenses');
     expenseHandler();
     debitHandler();
@@ -122,8 +120,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               padding: EdgeInsets.all(5),
               child: CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(
-                  widget.user.photoUrl ??
-                      "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png",
+                  "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png",
                 ),
               ),
             ),
@@ -417,7 +414,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         (DateTime.now().millisecondsSinceEpoch - 2592000000).toString();
     QuerySnapshot db = await Firestore.instance
         .collection('Users 2.0')
-        .document("${widget.user.phoneNumber}")
+        .document("${widget.user.phoneNumber.substring(widget.user.phoneNumber.length - 10)}")
         .collection('Expenses')
         .where('epochTime', isGreaterThanOrEqualTo: _time)
         .getDocuments();

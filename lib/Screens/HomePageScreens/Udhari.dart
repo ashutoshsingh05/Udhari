@@ -14,16 +14,23 @@ class Udhari extends StatefulWidget {
   _UdhariState createState() => _UdhariState();
 }
 
-class _UdhariState extends State<Udhari> {
+class _UdhariState extends State<Udhari> with SingleTickerProviderStateMixin {
   CollectionReference colRef;
+  AnimationController _controllerList;
 
   @override
   void initState() {
     super.initState();
     colRef = Firestore.instance
         .collection('Users 2.0')
-        .document('${widget.user.phoneNumber}')
+        .document(
+            '${widget.user.phoneNumber.substring(widget.user.phoneNumber.length - 10)}')
         .collection('Udhari');
+    _controllerList = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    _controllerList.forward();
   }
 
   @override
@@ -50,8 +57,7 @@ class _UdhariState extends State<Udhari> {
               leading: Padding(
                 padding: EdgeInsets.all(5),
                 child: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(widget
-                          .user.photoUrl ??
+                  backgroundImage: CachedNetworkImageProvider(
                       "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png"),
                 ),
               ),
@@ -99,13 +105,19 @@ class _UdhariState extends State<Udhari> {
                         child: Column(
                           children: snapshot.data.documents.map(
                             (DocumentSnapshot document) {
-                              return _cardBuilder(
-                                amount: document['amount'],
-                                dateTime: document['dateTime'],
-                                epochTime: document['epochTime'],
-                                expenseContext: document['context'],
-                                personName: document['personName'],
-                                photoUrl: document['photoUrl'],
+                              return ScaleTransition(
+                                scale: CurvedAnimation(
+                                  curve: Curves.elasticOut,
+                                  parent: _controllerList,
+                                ),
+                                child: _cardBuilder(
+                                  amount: document['amount'],
+                                  dateTime: document['dateTime'],
+                                  epochTime: document['epochTime'],
+                                  expenseContext: document['context'],
+                                  personName: document['personName'],
+                                  photoUrl: document['photoUrl'],
+                                ),
                               );
                             },
                           ).toList(),
@@ -139,7 +151,10 @@ class _UdhariState extends State<Udhari> {
           children: <Widget>[
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(photoUrl),
+                backgroundImage: CachedNetworkImageProvider(
+                  photoUrl ??
+                      "https://api.adorable.io/avatars/100/${widget.user.phoneNumber}.png",
+                ),
               ),
               dense: true,
               isThreeLine: true,

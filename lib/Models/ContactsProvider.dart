@@ -26,10 +26,7 @@ class ContactsProvider {
         (s) => s.displayName.toLowerCase().contains(query.toLowerCase()));
     matches.forEach((f) {
       matchesNames.add(f.displayName);
-      // print("matchesNames: $matchesNames");
-      // print("matches: ${f.displayName}");
     });
-    // print("matchesNames: $matchesNames");
     return matchesNames;
   }
 
@@ -42,7 +39,7 @@ class ContactsProvider {
       for (Item i in cntc.phones) {
         String number = i.value;
         number = number.replaceAll(RegExp('[\ \+\-\.\,\(\)\/\N\*\#\;]'), "");
-        print("length: ${number.length}");
+        // print("length: ${number.length}");
         if (number.length > 10) number = number.substring(number.length - 10);
         phonesNumbers.add(number);
       }

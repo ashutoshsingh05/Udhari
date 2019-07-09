@@ -197,7 +197,7 @@ class _LoginState extends State<Login> {
       codeSent: (String verficationID, [int resendcodeTimeout]) {
         print("Code Sent to device");
       },
-      timeout: Duration(seconds: 60),
+      timeout: Duration(seconds: 30),
       verificationFailed: (AuthException exception) {
         print("Verification Failed: $exception");
         _overlayEntry.remove();
@@ -234,12 +234,13 @@ class _LoginState extends State<Login> {
 
     await Firestore.instance
         .collection('Users 2.0')
-        .document(user.phoneNumber)
+        .document(user.phoneNumber.substring(user.phoneNumber.length - 10))
         .setData({
       "displayName": _displayNameController.text,
-      "phoneNumber": user.phoneNumber,
+      "phoneNumber": user.phoneNumber.substring(user.phoneNumber.length - 10),
       "uid": user.uid,
-      "photoUrl": "https://api.adorable.io/avatars/100/${user.phoneNumber}.png"
+      "photoUrl":
+          "https://api.adorable.io/avatars/100/${user.phoneNumber}.png"
     });
   }
 }

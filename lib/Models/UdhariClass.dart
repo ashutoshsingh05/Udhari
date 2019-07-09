@@ -5,16 +5,19 @@ class Udhari {
   Expenses expense;
   bool isBorrowed;
   bool isPaid;
+  bool isSelfAdded;
 
   Udhari({
     @required this.isBorrowed,
     @required this.expense,
     @required this.isPaid,
+    @required this.isSelfAdded,
   });
 
   Udhari.fromSnapshot(snapshot) {
     expense = snapshot.data['expense'];
     isBorrowed = snapshot.data['isBorrowed'];
+    isSelfAdded = snapshot.data['isSelfAdded'];
   }
 
   toJson() {
@@ -27,6 +30,7 @@ class Udhari {
       "isPaid": isPaid,
       "epochTime": expense.epochTime,
       "photoUrl": expense.photoUrl,
+      "isSelfAdded": isSelfAdded,
     };
   }
 }

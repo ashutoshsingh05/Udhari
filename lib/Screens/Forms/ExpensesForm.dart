@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -72,15 +71,15 @@ class _ExpensesFormState extends State<ExpensesForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent.withOpacity(0.3),
+      backgroundColor: Colors.blueAccent.withOpacity(0.6),
       appBar: AppBar(
         backgroundColor: Colors.deepPurple.withOpacity(0.5),
         title: Text("Expenses"),
       ),
       body: BackdropFilter(
         filter: ImageFilter.blur(
-          sigmaX: 6.0,
-          sigmaY: 6.0,
+          sigmaX: 5.0,
+          sigmaY: 5.0,
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20),
@@ -110,9 +109,8 @@ class _ExpensesFormState extends State<ExpensesForm> {
                             if (value.isEmpty) {
                               return "Amount cannot be empty!";
                             }
-                            if (double.parse(value) > 100000) {
-                              return "Amount is too large!";
-                            }
+                            //check if the value entered is ill
+                            //formatted(cotains more than one decimal)
                             int decimalCount = 0, i = 0;
                             while (i < value.length) {
                               if (value[i] == '.') {
@@ -123,13 +121,15 @@ class _ExpensesFormState extends State<ExpensesForm> {
                               }
                               i++;
                             }
+                            if (double.parse(value) > 100000) {
+                              return "Amount is too large!";
+                            }
+
                             return null;
                           },
                           decoration: InputDecoration(
-                            // filled: true,
-                            // fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                            errorStyle: TextStyle(
+                              color: Colors.white,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(Icons.backspace),
@@ -164,6 +164,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
                           return null;
                         },
                         decoration: InputDecoration(
+                          errorStyle: TextStyle(
+                            color: Colors.white,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.backspace),
                             onPressed: () {
@@ -192,6 +195,9 @@ class _ExpensesFormState extends State<ExpensesForm> {
                         format: formats[InputType.both],
                         editable: false,
                         decoration: InputDecoration(
+                          errorStyle: TextStyle(
+                            color: Colors.white,
+                          ),
                           helperText: "(Optional)",
                           icon: Icon(Icons.today),
                           labelText: 'Date/Time',
@@ -238,7 +244,7 @@ class _ExpensesFormState extends State<ExpensesForm> {
 
       await Firestore.instance
           .collection('Users 2.0')
-          .document(widget.user.phoneNumber)
+          .document(widget.user.phoneNumber.substring(widget.user.phoneNumber.length - 10))
           .collection('Expenses')
           .document(_time)
           .setData(expenses.toJson())
