@@ -4,6 +4,7 @@ import 'package:udhari_2/Screens/Forms/ExpensesForm.dart';
 import 'package:udhari_2/Screens/Forms/UdhariForm.dart';
 import 'package:udhari_2/Screens/Forms/TripsForm.dart';
 import 'package:udhari_2/Screens/HomePageScreens/Dashboard.dart';
+import 'package:udhari_2/Screens/HomePageScreens/Udhari.dart';
 import 'package:udhari_2/Utils/ScreenHandler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -35,13 +36,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   printProfile() {
-    print("======================================");
-    print("PROFILE");
-    print("displayName:${widget.user.displayName}");
-    print("photoUrl:${widget.user.photoUrl}");
-    print("phoneNumber:${widget.user.phoneNumber}");
-    print("uid:${widget.user.uid}");
-    print("======================================");
+    debugPrint("======================================");
+    debugPrint("PROFILE");
+    debugPrint("displayName:${widget.user.displayName}");
+    debugPrint("photoUrl:${widget.user.photoUrl}");
+    debugPrint("phoneNumber:${widget.user.phoneNumber}");
+    debugPrint("uid:${widget.user.uid}");
+    debugPrint("======================================");
   }
 
   @override

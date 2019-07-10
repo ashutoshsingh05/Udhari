@@ -12,9 +12,23 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:udhari_2/Models/ContactsProvider.dart';
 
 class UdhariForm extends StatefulWidget {
-  UdhariForm({@required this.user});
+  UdhariForm({
+    @required this.user,
+    this.amountOpt,
+    this.personNameOpt,
+    this.contextOpt,
+    this.dateTimeOpt,
+    this.udhariTypeValue,
+    this.epochTime,
+  });
 
   final FirebaseUser user;
+  final double amountOpt;
+  final String personNameOpt;
+  final String contextOpt;
+  final String dateTimeOpt;
+  final String epochTime;
+  final udhariTypeValue;
 
   @override
   _UdhariFormState createState() => _UdhariFormState();
@@ -53,6 +67,12 @@ class _UdhariFormState extends State<UdhariForm> {
   @override
   void initState() {
     super.initState();
+    udhariTypeValue = widget.udhariTypeValue;
+    amountController.text = widget.amountOpt.toString();
+    personNameController.text = widget.personNameOpt;
+    contextController.text = widget.contextOpt;
+    dateController.text = widget.dateTimeOpt;
+
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         return Container(
@@ -363,7 +383,8 @@ class _UdhariFormState extends State<UdhariForm> {
     if (_formKey.currentState.validate() == true) {
       _formKey.currentState.save();
       List<String> regPhones = List<String>();
-      final String _time = DateTime.now().millisecondsSinceEpoch.toString();
+      final String _time =
+          widget.epochTime ?? DateTime.now().millisecondsSinceEpoch.toString();
       List<String> allPhones =
           _contactsProvider.getPhoneNumbers(personNameController.text);
       regPhones = await fetchRegisteredPhones(allPhones);
@@ -469,6 +490,7 @@ class _UdhariFormState extends State<UdhariForm> {
       isBorrowed: udhariTypeValue == "Borrowed" ? true : false,
       isPaid: false,
       isSelfAdded: true,
+      phoneNumber: phoneNumber,
     );
 
     await Firestore.instance
@@ -489,6 +511,8 @@ class _UdhariFormState extends State<UdhariForm> {
             widget.user.displayName ?? widget.user.phoneNumber;
         udhari.isBorrowed = !udhari.isBorrowed;
         udhari.isSelfAdded = !udhari.isSelfAdded;
+        udhari.phoneNumber = widget.user.phoneNumber
+            .substring(widget.user.phoneNumber.length - 10);
         await Firestore.instance
             .collection("Users 2.0")
             .document(recipientPhone)
@@ -531,8 +555,8 @@ class _UdhariFormState extends State<UdhariForm> {
   }
 
   runMultiTransaction(List<String> phones, String time) {
-    List<Widget> columnElements = List<Widget>();
-    columnElements = phoneNumbersAsWidget(phones, time);
+    // List<Widget> columnElements = List<Widget>();
+    // columnElements = phoneNumbersAsWidget(phones, time);
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -561,7 +585,7 @@ class _UdhariFormState extends State<UdhariForm> {
         dense: true,
         onTap: () {
           Navigator.of(context).pop();
-          runRegularTransaction(phoneNumber, time);
+          runRegularTransaction(time, phoneNumber);
         },
       ));
     }

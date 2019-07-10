@@ -290,10 +290,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   dateTime: document['dateTime'],
                                   epochTime: document['epochTime'],
                                   expenseContext: document['context'],
-                                  // document['amount'],
-                                  // document['context'],
-                                  // document['dateTime'],
-                                  // document['epochTime'],
                                 ),
                               );
                             },
